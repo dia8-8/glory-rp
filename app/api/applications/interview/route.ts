@@ -15,52 +15,46 @@ export async function POST(req: Request) {
   const webhook = process.env.DISCORD_INTERVIEW_WEBHOOK;
   if (!webhook) return NextResponse.json({ error: 'Missing DISCORD_INTERVIEW_WEBHOOK' }, { status: 500 });
 
-  const body = await req.json().catch(() => ({})) as Record<string, unknown>;
+  const body = (await req.json().catch(() => ({}))) as Record<string, unknown>;
 
-  // Basic required fields
-  const required = ['age','timezone','hours','experience','about','mic','rulesOk'];
+  const required = ['age', 'timezone', 'hours', 'experience', 'about', 'mic', 'rulesOk'];
   const missing = required.filter(k => body[k] === undefined || body[k] === '' || body[k] === null);
   if (missing.length) return NextResponse.json({ error: `Missing: ${missing.join(', ')}` }, { status: 400 });
   if (String(body.rulesOk) !== 'true' && body.rulesOk !== true) {
     return NextResponse.json({ error: 'You must accept the rules.' }, { status: 400 });
   }
 
-    // Applicant identity from session (filled by NextAuth Discord callbacks)
-    const discordName =
-        (session as any).discordUsername ||
-        session.user?.name ||
-        'Unknown';
-    const avatar = typeof session.user?.image === 'string' ? session.user.image : undefined;
+  // Applicant identity
+  const discordName =
+    (session as any).discordUsername ||
+    session.user?.name ||
+    'Unknown';
+  const avatar = typeof session.user?.image === 'string' ? session.user.image : undefined;
 
-    const FIELD_VALUE_LIMIT = 1024;
+  const FIELD_VALUE_LIMIT = 1024;
 
-    const wrapInlineCode = (input: unknown) => {
-    // Turn undefined/null into '-', trim, and escape backticks so they don't break formatting
+  const wrapInlineCode = (input: unknown) => {
     const raw = String(input ?? '-').trim().replace(/```/g, "'''");
-    // Reserve 6 chars for opening/closing ```
     return '```' + raw.slice(0, FIELD_VALUE_LIMIT - 6) + '```';
-    };
+  };
 
-    const { about, ...rest } = body as Record<string, unknown>;
+  const wrapCodeBlock = (input: unknown) => {
+    const raw = String(input ?? '-').trim().replace(/```/g, "'''");
+    return '```' + raw.slice(0, FIELD_VALUE_LIMIT - 6) + '```';
+  };
 
-    const inlineFields = Object.entries(rest).map(([k, v]) => ({
+  const { about, ...rest } = body as Record<string, unknown>;
+
+  const inlineFields = Object.entries(rest).map(([k, v]) => ({
     name: trim(k, 256),
-    value: wrapInlineCode(v),   // ← wrap each value in `...`
+    value: wrapInlineCode(v),
     inline: true,
-    }));
+  }));
 
-    const wrapCodeBlock = (input: unknown) => {
-    const raw = String(input ?? '-').trim().replace(/```/g, "'''");
-    // Reserve 6 chars for opening/closing ```
-    return '```' + raw.slice(0, FIELD_VALUE_LIMIT - 6) + '```';
-    };
-
-    const fields = [
+  const fields = [
     ...inlineFields.slice(0, 24),
-    ...(about ? [{ name: 'About', value: wrapCodeBlock(about), inline: false }] : []),
-    ].slice(0, 25);
-
-  const origin = process.env.NEXT_PUBLIC_SITE_URL || new URL(req.url).origin;
+    ...(about ? [{ name: 'Story', value: wrapCodeBlock(about), inline: false }] : []),
+  ].slice(0, 25);
 
   const embed: any = {
     title: 'New Join Interview',
@@ -72,26 +66,28 @@ export async function POST(req: Request) {
     footer: { text: 'Glory RP | جلوري' },
   };
 
+  // Create Discord message payload
   const payload: any = {
     username: 'Interview Submissions',
     avatar_url: `https://i.imgur.com/sHnaTv4.png`,
     embeds: [embed],
   };
 
-  // Optional: ping a review role in the channel
+  // Add role + applicant mention
   const roleId = process.env.DISCORD_INTERVIEW_REVIEW_ROLE_ID;
   const discordUser = session.user?.name || session.user?.email || 'Unknown User';
-  const discordId = (session.user as any).id;
+  const discordId = (session.user as any)?.id;
   const discordMention = discordId ? `<@${discordId}>` : discordUser;
 
-   if (roleId) {
-    body.content = `<@&${roleId}> — Applicant: ${discordMention}`;
-    body.allowed_mentions = { parse: ['users'], roles: [roleId] };
+  if (roleId) {
+    payload.content = `<@&${roleId}> — Applicant: ${discordMention}`;
+    payload.allowed_mentions = { parse: ['users'], roles: [roleId] };
   } else {
-    body.content = `**Applicant:** ${discordMention}`;
-    body.allowed_mentions = { parse: ['users'] };
+    payload.content = `**Applicant:** ${discordMention}`;
+    payload.allowed_mentions = { parse: ['users'] };
   }
 
+  // Send webhook
   const r = await fetch(webhook, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
