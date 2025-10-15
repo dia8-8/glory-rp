@@ -18,9 +18,9 @@ export const metadata: Metadata = {
     title: 'Glory RP | جلوري',
     description: 'Serious RP • FiveM • Arabic/English',
     type: 'website',
-    images: ['/banner.png'],
+    images: ['/bg.png'],
   },
-  twitter: { card: 'summary_large_image', images: ['/banner.png'] },
+  twitter: { card: 'summary_large_image', images: ['/bg.png'] },
 };
 
 export default async function RootLayout({
