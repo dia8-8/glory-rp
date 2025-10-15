@@ -1,6 +1,5 @@
 'use client';
 
-import { SessionProvider } from 'next-auth/react';
 import { createContext, useContext, useEffect, useState } from 'react';
 
 export type Lang = 'ar' | 'en';
@@ -24,11 +23,9 @@ export function Providers({ children, initialLang = 'en' }: ProvidersProps) {
   }, [lang]);
 
   return (
-    <SessionProvider>
-      <LangCtx.Provider value={{ lang, setLang }}>
-        {children}
-      </LangCtx.Provider>
-    </SessionProvider>
+    <LangCtx.Provider value={{ lang, setLang }}>
+      {children}
+    </LangCtx.Provider>
   );
 }
 
