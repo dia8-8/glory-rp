@@ -98,10 +98,15 @@ export async function POST(req: Request, { params }: { params: { job: string } }
   };
 
   const roleId = (job as any).mentionRoleId ?? FALLBACK_ROLE_MAP[jobKey];
+  const discordId = (session.user as any).id;
+  const discordUser = session.user?.name || session.user?.email || 'Unknown User';
+  const discordMention = discordId ? `<@${discordId}>` : discordUser;
 
   if (roleId) {
-    body.content = `<@&${roleId}>`;
-    body.allowed_mentions = { parse: [], roles: [roleId] };
+    body.content = `<@&${roleId}> — Applicant: ${discordMention}`;
+    body.allowed_mentions = { parse: ['users'], roles: [roleId] };
+  } else {
+    body.content = `**Applicant:** ${discordUser}`;
   }
 
   const r = await fetch(webhook, {
