@@ -36,9 +36,9 @@ export async function POST(req: Request) {
 
     const wrapInlineCode = (input: unknown) => {
     // Turn undefined/null into '-', trim, and escape backticks so they don't break formatting
-    const raw = String(input ?? '-').trim().replace(/`/g, '\\`');
-    // Reserve 2 chars for the surrounding backticks
-    return '`' + raw.slice(0, FIELD_VALUE_LIMIT - 2) + '`';
+    const raw = String(input ?? '-').trim().replace(/```/g, "'''");
+    // Reserve 6 chars for opening/closing ```
+    return '```' + raw.slice(0, FIELD_VALUE_LIMIT - 6) + '```';
     };
 
     const { about, ...rest } = body as Record<string, unknown>;
@@ -80,9 +80,16 @@ export async function POST(req: Request) {
 
   // Optional: ping a review role in the channel
   const roleId = process.env.DISCORD_INTERVIEW_REVIEW_ROLE_ID;
-  if (roleId) {
-    payload.content = `<@&${roleId}>`;
-    payload.allowed_mentions = { parse: [], roles: [roleId] };
+  const discordUser = session.user?.name || session.user?.email || 'Unknown User';
+  const discordId = (session.user as any).id;
+  const discordMention = discordId ? `<@${discordId}>` : discordUser;
+
+   if (roleId) {
+    body.content = `<@&${roleId}> — Applicant: ${discordMention}`;
+    body.allowed_mentions = { parse: ['users'], roles: [roleId] };
+  } else {
+    body.content = `**Applicant:** ${discordMention}`;
+    body.allowed_mentions = { parse: ['users'] };
   }
 
   const r = await fetch(webhook, {

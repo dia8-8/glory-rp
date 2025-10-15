@@ -24,21 +24,22 @@ export async function POST(req: Request, { params }: { params: { job: string } }
     .filter((f: any) => f.required && f.name !== 'discord')
     .filter((f: any) => !payload[f.name] && payload[f.name] !== 0)
     .map((f: any) => f.name);
-  if (missing.length) return NextResponse.json({ error: `Missing: ${missing.join(', ')}` }, { status: 400 });
+  if (missing.length) {
+    return NextResponse.json({ error: `Missing: ${missing.join(', ')}` }, { status: 400 });
+  }
 
   const webhook = process.env[job.webhookEnv] || process.env.DISCORD_APPLICATIONS_WEBHOOK;
   if (!webhook) return NextResponse.json({ error: 'Missing webhook env var' }, { status: 500 });
 
   // -------- build embed ----------
-  const origin = process.env.NEXT_PUBLIC_SITE_URL || new URL(req.url).origin;
   const discordName = (session.user?.name as string) || 'Unknown';
   const avatar = typeof session.user?.image === 'string' ? session.user.image : undefined;
 
   const FALLBACK_ROLE_MAP: Partial<Record<JobKey, string>> = {
-  police: process.env.DISCORD_ROLEID_POLICE,
-  ems: process.env.DISCORD_ROLEID_EMS,
-  justice: process.env.DISCORD_ROLEID_JUSTICE,
-  mechanic: process.env.DISCORD_ROLEID_MECHANIC,
+    police: process.env.DISCORD_ROLEID_POLICE,
+    ems: process.env.DISCORD_ROLEID_EMS,
+    justice: process.env.DISCORD_ROLEID_JUSTICE,
+    mechanic: process.env.DISCORD_ROLEID_MECHANIC,
   };
 
   const isHttpUrl = (u?: string) => !!u && /^https?:\/\//i.test(u);
@@ -47,10 +48,9 @@ export async function POST(req: Request, { params }: { params: { job: string } }
   const { about, ...rest } = payload as Record<string, unknown>;
 
   const FIELD_VALUE_LIMIT = 1024;
-
   const wrapInlineCode = (v: unknown) => {
-    const raw = String(v ?? '-').trim().replace(/`/g, '\\`');
-    return '```' + raw.slice(0, FIELD_VALUE_LIMIT - 2) + '```';
+    const raw = String(v ?? '-').trim().replace(/```/g, "'''");
+    return '```' + raw.slice(0, FIELD_VALUE_LIMIT - 6) + '```';
   };
 
   const wrapCodeBlock = (v: unknown) => {
@@ -69,14 +69,15 @@ export async function POST(req: Request, { params }: { params: { job: string } }
   const fields = [
     ...inlineFields.slice(0, 24),
     ...(about
-      ? [{
-          name: 'About',
-          value: wrapCodeBlock(about),
-          inline: false,
-        }]
+      ? [
+          {
+            name: 'About',
+            value: wrapCodeBlock(about),
+            inline: false,
+          },
+        ]
       : []),
   ].slice(0, 25);
-
 
   const embed: any = {
     title: trim(`New ${job.titleEn} application`, 256),
@@ -91,22 +92,24 @@ export async function POST(req: Request, { params }: { params: { job: string } }
   const imgUrl = `https://i.imgur.com/qnax1g2.png`;
   if (isHttpUrl(imgUrl)) embed.image = { url: imgUrl };
 
+  // ------------- applicant mention setup -------------
+  const roleId = (job as any).mentionRoleId ?? FALLBACK_ROLE_MAP[jobKey];
+  const discordId = (session.user as any)?.id;
+  const discordUser = session.user?.name || session.user?.email || 'Unknown User';
+  const discordMention = discordId ? `<@${discordId}>` : discordUser;
+
   const body: any = {
-    username: 'Jobs Applications', 
+    username: 'Jobs Applications',
     avatar_url: `https://i.imgur.com/sHnaTv4.png`,
     embeds: [embed],
   };
-
-  const roleId = (job as any).mentionRoleId ?? FALLBACK_ROLE_MAP[jobKey];
-  const discordId = (session.user as any).id;
-  const discordUser = session.user?.name || session.user?.email || 'Unknown User';
-  const discordMention = discordId ? `<@${discordId}>` : discordUser;
 
   if (roleId) {
     body.content = `<@&${roleId}> — Applicant: ${discordMention}`;
     body.allowed_mentions = { parse: ['users'], roles: [roleId] };
   } else {
-    body.content = `**Applicant:** ${discordUser}`;
+    body.content = `**Applicant:** ${discordMention}`;
+    body.allowed_mentions = { parse: ['users'] };
   }
 
   const r = await fetch(webhook, {
@@ -119,6 +122,6 @@ export async function POST(req: Request, { params }: { params: { job: string } }
     const text = await r.text().catch(() => '');
     return NextResponse.json({ error: `Webhook ${r.status}: ${text}` }, { status: r.status });
   }
+
   return NextResponse.json({ ok: true });
 }
-
