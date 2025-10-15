@@ -27,7 +27,7 @@ export default function HomePage() {
 
         {/* Hero content */}
         <div className="relative z-20 max-w-3xl px-4">
-          <Reveal><h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl">{L.hero.title}</h1></Reveal>
+          <Reveal><h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl whitespace-pre-line">{L.hero.title}</h1></Reveal>
           <Reveal delay={0.08}><p className="mt-4 text-lg text-white/90">{L.hero.body}</p></Reveal>
           <Reveal delay={0.16}>
             <div className="mt-6 flex flex-wrap justify-center gap-3">

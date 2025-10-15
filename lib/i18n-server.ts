@@ -22,7 +22,7 @@ export function t(lang: Lang) {
       login: isAr ? 'تسجيل الدخول' : 'Log in',
     },
     hero: {
-      title: isAr ? 'حياكم في السيرفر — عِش رول بلاي واقعي' : 'Welcome — Live immersive, realistic RP',
+      title: isAr   ? 'جلوري RP \nتجربة رول بلاي واقعية وغامرة' : 'GLORY RP \nLive immersive, realistic RP',
       body: isAr ? 'نسعى لتقديم أفضل تجربة فايف إم في الشرق الأوسط. انضم الديسكورد وابدأ رحلتك الآن.' : 'We deliver a premium FiveM experience. Join Discord and start your story today.',
       ctaJoin: isAr ? ' انضم إلينا' : 'Join US',
       ctaRules: isAr ? 'اطّلع على القوانين' : 'View Rules',
