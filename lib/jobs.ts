@@ -27,7 +27,7 @@ export const JOBS: Record<JobKey, {
     descEn: 'Serve and protect the city. Training provided; experience preferred.',
     descAr: 'خدمة وحماية المدينة. توجد تدريبات، والخبرة ميزة.',
     embedImage: '/bg.png', 
-    mentionRoleId: '1359746032782545016',
+    mentionRoleId: '1427851125830451210',
     fields: [
       { type: 'text', name: 'discord', required: true, labelEn: 'Discord', labelAr: 'دسكورد', placeholderEn: 'username', placeholderAr: 'اسم المستخدم' },
       { type: 'text', name: 'name', required: true, labelEn: 'Full Name', labelAr: 'الاسم الكامل' },
@@ -45,7 +45,7 @@ export const JOBS: Record<JobKey, {
     descEn: 'Respond to emergencies and save lives. Calm and professionalism.',
     descAr: 'الاستجابة للطوارئ وإنقاذ الأرواح. الهدوء والاحترافية مطلوبة.',
     embedImage: '/bg.png', 
-    mentionRoleId: '1359746032782545016',
+    mentionRoleId: '1427851166485712966',
     fields: [
       { type: 'text', name: 'discord', required: true, labelEn: 'Discord', labelAr: 'دسكورد' },
       { type: 'text', name: 'name', required: true, labelEn: 'Full Name', labelAr: 'الاسم الكامل' },
@@ -62,7 +62,7 @@ export const JOBS: Record<JobKey, {
     descEn: 'Keep the city moving. Repairs, tuning, and customer service.',
     descAr: 'حافظ على حركة المدينة. إصلاحات وتعديل وخدمة العملاء.',
     embedImage: '/bg.png', 
-    mentionRoleId: '1359746032782545016',
+    mentionRoleId: '1427851199020793867',
     fields: [
       
       { type: 'text', name: 'discord', required: true, labelEn: 'Discord', labelAr: 'دسكورد' },
@@ -80,7 +80,7 @@ export const JOBS: Record<JobKey, {
     descEn: 'Lawyers, prosecutors, and judges ensuring fair play.',
     descAr: 'محامون، وكلاء نيابة، وقضاة لضمان العدالة.',
     embedImage: '/bg.png', 
-    mentionRoleId: '1359746032782545016',
+    mentionRoleId: '1427851241459023892',
     fields: [
       
       { type: 'text', name: 'discord', required: true, labelEn: 'Discord', labelAr: 'دسكورد' },
