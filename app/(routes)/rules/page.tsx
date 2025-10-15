@@ -325,11 +325,11 @@ return (
     <div className="pointer-events-none fixed inset-0 -z-10 bg-black/50" />
 
     <main className="mx-auto max-w-5xl px-4 pb-14 pt-24 sm:pt-28 md:pt-32">
+      <Reveal>
       <div className="mx-auto mb-8 max-w-3xl text-center">
         <h2 className="text-3xl font-extrabold sm:text-4xl md:text-5xl">{L.nav.rules}</h2>
         <p className="mt-3 text-base text-white/80">{L.rules.body}</p>
       </div>
-      <Reveal>
       <div className="space-y-3">
         {items.map((r, i) => (
           <details
