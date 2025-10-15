@@ -1,3 +1,4 @@
+import Reveal from '@/components/Reveal';
 import { t, getLang } from '@/lib/i18n-server';
 
 const RULE_SECTIONS = [
@@ -328,7 +329,7 @@ return (
         <h2 className="text-3xl font-extrabold sm:text-4xl md:text-5xl">{L.nav.rules}</h2>
         <p className="mt-3 text-base text-white/80">{L.rules.body}</p>
       </div>
-
+      <Reveal>
       <div className="space-y-3">
         {items.map((r, i) => (
           <details
@@ -362,6 +363,7 @@ return (
           </details>
         ))}
       </div>
+      </Reveal>
     </main>
   </div>
 );

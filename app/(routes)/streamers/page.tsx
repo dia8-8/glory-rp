@@ -1,6 +1,7 @@
 import { STREAMERS } from '@/data/streamers';
 import CreatorCard from '@/components/CreatorCard';
 import { t, getLang } from '@/lib/i18n-server';
+import Reveal from '@/components/Reveal';
 
 export default function StreamersPage() {
   const L = t(getLang());
@@ -13,7 +14,7 @@ export default function StreamersPage() {
         aria-hidden
       />
       <div className="absolute inset-0 -z-10 bg-black/50" aria-hidden />
-
+      <Reveal>
       <div className="mx-auto mb-8 max-w-3xl text-center">
         <h2 className="text-3xl font-extrabold sm:text-4xl md:text-5xl">{L.nav.streamers}</h2>
         <p className="mt-3 text-base text-white/80">{L.live.subtitle}</p>
@@ -27,6 +28,7 @@ export default function StreamersPage() {
           ))}
         </div>
       </div>
+      </Reveal>
     </main>
   );
 }
