@@ -4,6 +4,7 @@ import { t, getLang } from '@/lib/i18n';
 import { BRAND } from '@/lib/brand';
 import LanguageToggle from './LanguageToggle';
 import AuthButtons from './AuthButtons';
+import JoinUsCta from './JoinUsCta';
 
 export default function Navbar() {
   const lang = getLang();
@@ -29,6 +30,7 @@ export default function Navbar() {
           <Link className="btn btn-ghost" href="/rules">{L.nav.rules}</Link>
           <Link className="btn btn-ghost" href="/jobs">{L.nav.jobs}</Link>
           <a className="btn btn-ghost" href={BRAND.store} target="_blank" rel="noreferrer">{L.nav.store}</a>
+          <JoinUsCta label={L.hero.ctaJoin} />
         </nav>
         <div className="flex items-center gap-2">
           <LanguageToggle />
