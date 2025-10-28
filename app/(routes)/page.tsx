@@ -66,17 +66,17 @@ export default function HomePage() {
         <Reveal delay={0.08}><p className="mt-3 text-base text-white/80">{L.social.body}</p></Reveal>
       </div>
 
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
         <Reveal><Stat label={L.social.members} value={"900"} /></Reveal>
         <Reveal delay={0.06}><Stat label={L.social.followers} value={"1700"} /></Reveal>
-        <Reveal delay={0.12}><Stat label={L.social.twitter} value={"600"} /></Reveal>
+        {/*<Reveal delay={0.12}><Stat label={L.social.twitter} value={"600"} /></Reveal>*/}
       </div>
 
       <Reveal delay={0.18}>
         <div className="mt-6 flex flex-wrap gap-3 text-sm">
           <a href={BRAND.tiktok} target="_blank" rel="noreferrer" className="btn btn-ghost">{L.social.tiktok}</a>
           <a href={BRAND.discord} target="_blank" rel="noreferrer" className="btn btn-ghost">{L.social.discord}</a>
-          <a href={BRAND.twitter} target="_blank" rel="noreferrer" className="btn btn-ghost">{L.social.twitter}</a>
+          {/*<a href={BRAND.twitter} target="_blank" rel="noreferrer" className="btn btn-ghost">{L.social.twitter}</a>*/}
         </div>
       </Reveal>
 

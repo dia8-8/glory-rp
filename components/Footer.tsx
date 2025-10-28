@@ -1,6 +1,5 @@
 import { t, getLang } from '@/lib/i18n-server';
 import { BRAND } from '@/lib/brand';
-import { Twitter,} from 'lucide-react';
 import { SiDiscord, SiTiktok } from 'react-icons/si';
 
 
@@ -12,7 +11,7 @@ export default function Footer() {
         <div>{L.footer}</div>
         <div className="flex items-center gap-4">
           <a className="hover:opacity-80" href={BRAND.discord} target="_blank" rel="noreferrer" aria-label="Discord"><SiDiscord size={22} /></a>
-          <a className="hover:opacity-80" href={BRAND.twitter} target="_blank" rel="noreferrer" aria-label="Twitter"><Twitter size={22} /></a>
+          {/*<a className="hover:opacity-80" href={BRAND.twitter} target="_blank" rel="noreferrer" aria-label="Twitter"><Twitter size={22} /></a>*/}
           <a className="hover:opacity-80" href={BRAND.tiktok} target="_blank" rel="noreferrer" aria-label="Kick"><SiTiktok size={22} /></a>
         </div>
       </div>

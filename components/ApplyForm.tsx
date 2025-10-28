@@ -76,7 +76,7 @@ export default function ApplyForm({
         <p className="mt-1 text-xs text-white/60">{isAr ? 'تم جلبه من تسجيل الدخول.' : 'Fetched from your sign-in.'}</p>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-1">
         <div>
             <label className="text-sm opacity-80">{isAr ? 'اسم شخصيتك' : 'Your character name'}</label>
             <input name="name" placeholder={isAr ? 'يجب أن يكون الاسم الحقيقي' : 'Must be a real name'} value={form.name} onChange={onChange}
@@ -87,19 +87,19 @@ export default function ApplyForm({
           <input name="age" type="number" min={16} value={form.age} onChange={onChange}
                  className="mt-1 w-full rounded-xl border border-white/15 bg-white/5 px-3 py-2" required />
         </div>
-        <div>
+        {/* <div>
           <label className="text-sm opacity-80">{isAr ? 'المنطقة الزمنية' : 'Timezone'}</label>
           <input name="timezone" placeholder={isAr ? 'مثال: GMT+3' : 'e.g. GMT+3'} value={form.timezone} onChange={onChange}
                  className="mt-1 w-full rounded-xl border border-white/15 bg-white/5 px-3 py-2" required />
-        </div>
+        </div> */}
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <div>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-1">
+        {/* <div>
           <label className="text-sm opacity-80">{isAr ? 'ساعات اللعب أسبوعيًا' : 'Hours per week'}</label>
           <input name="hours" type="number" min={0} value={form.hours} onChange={onChange}
                  className="mt-1 w-full rounded-xl border border-white/15 bg-white/5 px-3 py-2" required />
-        </div>
+        </div> */}
         <div>
           <label className="text-sm opacity-80">{isAr ? 'هل لديك مايكروفون؟' : 'Do you have a microphone?'}</label>
           <select name="mic" value={form.mic} onChange={onChange}
