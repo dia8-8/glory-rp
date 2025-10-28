@@ -76,7 +76,7 @@ export default function ApplyForm({
         <p className="mt-1 text-xs text-white/60">{isAr ? 'تم جلبه من تسجيل الدخول.' : 'Fetched from your sign-in.'}</p>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-1">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>
             <label className="text-sm opacity-80">{isAr ? 'اسم شخصيتك' : 'Your character name'}</label>
             <input name="name" placeholder={isAr ? 'يجب أن يكون الاسم الحقيقي' : 'Must be a real name'} value={form.name} onChange={onChange}
