@@ -1,4 +1,4 @@
-export type JobKey = 'police' | 'ems' | 'justice' | 'mechanic';
+export type JobKey = 'police' | 'ems' | 'justice';
 
 export type Field =
   | { type: 'text' | 'number'; name: string; required?: boolean;
@@ -32,7 +32,7 @@ export const JOBS: Record<JobKey, {
       { type: 'text', name: 'discord', required: true, labelEn: 'Discord', labelAr: 'دسكورد', placeholderEn: 'username', placeholderAr: 'اسم المستخدم' },
       { type: 'text', name: 'name', required: true, labelEn: 'Full Name', labelAr: 'الاسم الكامل' },
       { type: 'number', name: 'age', required: true, min: 18, labelEn: 'Age', labelAr: 'العمر' },
-      { type: 'text', name: 'callsign', labelEn: 'Preferred Callsign', labelAr: 'النداء المفضل' },
+      // { type: 'text', name: 'callsign', labelEn: 'Preferred Callsign', labelAr: 'النداء المفضل' },
       { type: 'number', name: 'city_hours', min: 0, labelEn: 'Estimated City Hours', labelAr: 'عدد ساعاتك بالمدينة (تقديري)' },
       { type: 'textarea', name: 'about', required: true, labelEn: 'Tell us about your experience if any & Why do you want to join?', labelAr: 'أخبرنا عن تجربتك إن وجدت ولماذا تريد الانضمام؟' },
     ],
@@ -50,28 +50,28 @@ export const JOBS: Record<JobKey, {
       { type: 'text', name: 'discord', required: true, labelEn: 'Discord', labelAr: 'دسكورد' },
       { type: 'text', name: 'name', required: true, labelEn: 'Full Name', labelAr: 'الاسم الكامل' },
       { type: 'number', name: 'age', required: true, min: 16, labelEn: 'Age', labelAr: 'العمر' },
-      { type: 'text', name: 'certs', labelEn: 'Medical Certs (if any)', labelAr: 'شهادات طبية (إن وجدت)' },
+      { type: 'number', name: 'city_hours', min: 0, labelEn: 'Estimated City Hours', labelAr: 'عدد ساعاتك بالمدينة (تقديري)' },
       { type: 'textarea', name: 'about', required: true, labelEn: 'Tell us about your EMS experience', labelAr: 'حدثنا عن خبرتك بالإسعاف' },
     ],
   },
-  mechanic: {
-    slug: 'mechanic',
-    webhookEnv: 'DISCORD_WEBHOOK_MECHANIC',
-    titleEn: 'Mechanic',
-    titleAr: 'الميكانيكي',
-    descEn: 'Keep the city moving. Repairs, tuning, and customer service.',
-    descAr: 'حافظ على حركة المدينة. إصلاحات وتعديل وخدمة العملاء.',
-    embedImage: '/bg.png', 
-    mentionRoleId: '1427851199020793867',
-    fields: [
+  // mechanic: {
+  //   slug: 'mechanic',
+  //   webhookEnv: 'DISCORD_WEBHOOK_MECHANIC',
+  //   titleEn: 'Mechanic',
+  //   titleAr: 'الميكانيكي',
+  //   descEn: 'Keep the city moving. Repairs, tuning, and customer service.',
+  //   descAr: 'حافظ على حركة المدينة. إصلاحات وتعديل وخدمة العملاء.',
+  //   embedImage: '/bg.png', 
+  //   mentionRoleId: '1427851199020793867',
+  //   fields: [
       
-      { type: 'text', name: 'discord', required: true, labelEn: 'Discord', labelAr: 'دسكورد' },
-      { type: 'text', name: 'name', required: true, labelEn: 'Full Name', labelAr: 'الاسم الكامل' },
-      { type: 'number', name: 'age', required: true, min: 16, labelEn: 'Age', labelAr: 'العمر' },
-      { type: 'textarea', name: 'skills', required: true, labelEn: 'Mechanical skills', labelAr: 'مهاراتك الميكانيكية' },
-      { type: 'textarea', name: 'about', required: true, labelEn: 'Why this role?', labelAr: 'لماذا هذا الدور؟' },
-    ],
-  },
+  //     { type: 'text', name: 'discord', required: true, labelEn: 'Discord', labelAr: 'دسكورد' },
+  //     { type: 'text', name: 'name', required: true, labelEn: 'Full Name', labelAr: 'الاسم الكامل' },
+  //     { type: 'number', name: 'age', required: true, min: 16, labelEn: 'Age', labelAr: 'العمر' },
+  //     { type: 'textarea', name: 'skills', required: true, labelEn: 'Mechanical skills', labelAr: 'مهاراتك الميكانيكية' },
+  //     { type: 'textarea', name: 'about', required: true, labelEn: 'Why this role?', labelAr: 'لماذا هذا الدور؟' },
+  //   ],
+  // },
   justice: {
     slug: 'justice',
     webhookEnv: 'DISCORD_WEBHOOK_JUSTICE',
@@ -86,6 +86,7 @@ export const JOBS: Record<JobKey, {
       { type: 'text', name: 'discord', required: true, labelEn: 'Discord', labelAr: 'دسكورد' },
       { type: 'text', name: 'name', required: true, labelEn: 'Full Name', labelAr: 'الاسم الكامل' },
       { type: 'number', name: 'age', required: true, min: 18, labelEn: 'Age', labelAr: 'العمر' },
+      { type: 'number', name: 'city_hours', min: 0, labelEn: 'Estimated City Hours', labelAr: 'عدد ساعاتك بالمدينة (تقديري)' },
       {
         type: 'select', name: 'specialty', required: true,
         labelEn: 'Specialty', labelAr: 'التخصص',

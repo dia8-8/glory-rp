@@ -39,7 +39,7 @@ export async function POST(req: Request, { params }: { params: { job: string } }
     police: process.env.DISCORD_ROLEID_POLICE,
     ems: process.env.DISCORD_ROLEID_EMS,
     justice: process.env.DISCORD_ROLEID_JUSTICE,
-    mechanic: process.env.DISCORD_ROLEID_MECHANIC,
+    //mechanic: process.env.DISCORD_ROLEID_MECHANIC,
   };
 
   const isHttpUrl = (u?: string) => !!u && /^https?:\/\//i.test(u);
