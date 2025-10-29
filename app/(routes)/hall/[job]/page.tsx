@@ -16,7 +16,7 @@ export default async function CityhallPage({
   if (!category) return notFound();
 
   const session = await getServerSession(authOptions);
-  if (!session) redirect(`/signin?callbackUrl=/cityhall/${categoryKey}`);
+  if (!session) redirect(`/signin?callbackUrl=/hall/${categoryKey}`);
 
   const discordName = session.user?.name || '';
   const lang = getLang();
