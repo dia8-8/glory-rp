@@ -130,7 +130,7 @@ export default function CityHallForm({
                   value={form[f.name] ?? ''}
                   onChange={onChange}
                   required={!!f.required}
-                   className="mt-1 w-full rounded-xl border border-white/15 bg-[#a60be3]/80 text-white/90 px-3 py-2 outline-none transition focus:border-[#c27cff] focus:ring-1 focus:ring-[#c27cff] appearance-none custom-select"
+                   className="mt-1 w-full rounded-xl border border-white/15 bg-white/5 text-white/90 px-3 py-2 outline-none transition focus:border-[#c27cff] focus:ring-1 focus:ring-[#c27cff] appearance-none"
                 >
                   <option value="">{L.isAr ? 'اختر' : 'Select'}</option>
                   {f.options?.map((o) => (

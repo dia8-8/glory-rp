@@ -23,21 +23,3 @@ html { scroll-behavior: smooth; }
   background-size: 24px 24px;
 }
 .blob { filter: blur(40px); opacity:.5; }
-
-/* Custom purple dropdown styling */
-.custom-select {
-  background-color: rgba(166, 11, 227, 0.8);
-  border-radius: 0.75rem;
-  color: #fff;
-}
-
-.custom-select option {
-  background-color: #6b21a8; /* deep purple for dropdown list */
-  color: #fff;
-  border-radius: 0.75rem;
-}
-
-.custom-select:focus {
-  outline: none;
-  box-shadow: 0 0 0 2px #c27cff;
-}
