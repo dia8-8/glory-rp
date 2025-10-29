@@ -53,11 +53,21 @@ export default function CityHallForm({
 
   const visibleFields = useMemo(() => {
     return fields.filter((f: any) => {
-      if (!f.showIf) return true;
-      const [depField, expected] = Object.entries(f.showIf)[0];
-      return form[depField] === expected;
+      // No group = always show
+      if (!f.group) return true;
+
+      // For complaints, show fields matching the selected complaintType
+      if (categoryKey === 'complaint') {
+        if (form.complaintType === 'government' && f.group === 'government') return true;
+        if (form.complaintType === 'project' && f.group === 'project') return true;
+        return false;
+      }
+
+      // For other categories, just show all
+      return true;
     });
-  }, [fields, form]);
+  }, [fields, form, categoryKey]);
+
 
   useEffect(() => setForm(initial), [initial]);
 

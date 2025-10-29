@@ -163,132 +163,129 @@ export const CITYHALL: Record<CityhallKey, any> = {
   },
 
   complaint: {
-  slug: 'complaint',
-  titleEn: 'Submit a Complaint',
-  titleAr: 'تقديم شكوى',
-  descEn:
-    'Report an issue to the City Hall. Choose whether your complaint is against a government agency or a project.',
-  descAr:
-    'قدّم شكوى إلى بلدية المدينة. اختر نوع الشكوى أولاً — ضد جهة حكومية أو ضد مشروع.',
-  webhookEnv: 'DISCORD_CITYHALL_COMPLAINT_WEBHOOK',
-  mentionRoleId: process.env.DISCORD_ROLEID_COMPLAINT,
-  fields: [
-    {
-      name: 'complaintType',
-      labelEn: 'Complaint Type',
-      labelAr: 'نوع الشكوى',
-      type: 'select',
-      required: true,
-      options: [
-        { value: 'gov', labelEn: 'Against a Government Agency', labelAr: 'شكوى ضد جهة حكومية' },
-        { value: 'project', labelEn: 'Against a Project', labelAr: 'شكوى ضد مشروع' },
-      ],
-    },
+    slug: 'complaint',
+    titleEn: 'Submit a Complaint',
+    titleAr: 'تقديم شكوى',
+    descEn:
+      'Report an issue to the City Hall. Choose whether your complaint is against a government agency or a project.',
+    descAr:
+      'قدّم شكوى إلى بلدية المدينة. اختر نوع الشكوى أولاً — ضد جهة حكومية أو ضد مشروع.',
+    webhookEnv: 'DISCORD_CITYHALL_COMPLAINT_WEBHOOK',
+    mentionRoleId: process.env.DISCORD_ROLEID_COMPLAINT,
+    fields: [
+      {
+        name: 'complaintType',
+        labelEn: 'Complaint Type',
+        labelAr: 'نوع الشكوى',
+        type: 'select',
+        required: true,
+        options: [
+          { value: 'government', labelEn: 'Against a Government Agency', labelAr: 'شكوى ضد جهة حكومية' },
+          { value: 'project', labelEn: 'Against a Project', labelAr: 'شكوى ضد مشروع' },
+        ],
+      },
 
-    // 🟣 Government Complaint Fields
-    {
-      name: 'govDepartment',
-      labelEn: 'Government Department',
-      labelAr: 'الجهة الحكومية',
-      type: 'select',
-      required: true,
-      options: [
-        { value: 'interior', labelEn: 'Ministry of Interior', labelAr: 'وزارة الداخلية' },
-        { value: 'health', labelEn: 'Ministry of Health', labelAr: 'وزارة الصحة' },
-      ],
-      showIf: { complaintType: 'gov' },
-    },
-    {
-      name: 'complainantName',
-      labelEn: 'Complainant Name',
-      labelAr: 'اسم المشتكي',
-      type: 'text',
-      required: true,
-    },
-    {
-      name: 'age',
-      labelEn: 'Age',
-      labelAr: 'العمر',
-      type: 'number',
-      required: true,
-    },
-    {
-      name: 'phone',
-      labelEn: 'In-city Phone Number',
-      labelAr: 'رقم الهاتف في المدينة',
-      type: 'text',
-      required: true,
-    },
-    {
-      name: 'idNumber',
-      labelEn: 'Citizen ID',
-      labelAr: 'رقم الهوية',
-      type: 'text',
-      required: true,
-    },
+      // 🟣 Government Complaint Fields
+      {
+        name: 'govDepartment',
+        labelEn: 'Government Department',
+        labelAr: 'الجهة الحكومية',
+        type: 'select',
+        required: true,
+        options: [
+          { value: 'interior', labelEn: 'Ministry of Interior', labelAr: 'وزارة الداخلية' },
+          { value: 'health', labelEn: 'Ministry of Health', labelAr: 'وزارة الصحة' },
+        ],
+        group: 'government',
+      },
+      {
+        name: 'accusedName',
+        labelEn: 'Accused Person Name',
+        labelAr: 'اسم المشتكى عليه',
+        type: 'text',
+        required: true,
+        group: 'government',
+      },
+      {
+        name: 'accusedRank',
+        labelEn: 'Rank',
+        labelAr: 'الرتبة',
+        type: 'text',
+        required: true,
+        group: 'government',
+      },
 
-    // ---- Govt Only ----
-    {
-      name: 'accusedName',
-      labelEn: 'Accused Person Name',
-      labelAr: 'اسم المشتكى عليه',
-      type: 'text',
-      required: true,
-      showIf: { complaintType: 'gov' },
-    },
-    {
-      name: 'accusedRank',
-      labelEn: 'Rank',
-      labelAr: 'الرتبة',
-      type: 'text',
-      required: true,
-      showIf: { complaintType: 'gov' },
-    },
+      // 🟣 Project Complaint Fields
+      {
+        name: 'projectName',
+        labelEn: 'Project Name (complained about)',
+        labelAr: 'اسم المشروع المشتكى عليه',
+        type: 'text',
+        required: true,
+        group: 'project',
+      },
+      {
+        name: 'accusedProjectPerson',
+        labelEn: 'Accused Person Name',
+        labelAr: 'اسم الشخص المشتكى عليه',
+        type: 'text',
+        required: true,
+        group: 'project',
+      },
+      {
+        name: 'accusedRole',
+        labelEn: 'Role in Project (Employee / Owner)',
+        labelAr: 'صفته داخل المشروع (موظف / مالك)',
+        type: 'text',
+        required: true,
+        group: 'project',
+      },
 
-    // ---- Project Only ----
-    {
-      name: 'projectName',
-      labelEn: 'Project Name (complained about)',
-      labelAr: 'اسم المشروع المشتكى عليه',
-      type: 'text',
-      required: true,
-      showIf: { complaintType: 'project' },
-    },
-    {
-      name: 'accusedProjectPerson',
-      labelEn: 'Accused Person Name',
-      labelAr: 'اسم الشخص المشتكى عليه',
-      type: 'text',
-      required: true,
-      showIf: { complaintType: 'project' },
-    },
-    {
-      name: 'accusedRole',
-      labelEn: 'Role in Project (e.g. Employee / Owner)',
-      labelAr: 'صفته داخل المشروع (موظف / مالك)',
-      type: 'text',
-      required: true,
-      showIf: { complaintType: 'project' },
-    },
-
-    // ---- Shared Fields ----
-    {
-      name: 'incidentDate',
-      labelEn: 'Date of Incident',
-      labelAr: 'تاريخ الحادث المتسبب في الشكوى',
-      placeholderEn: 'yyyy-mm-dd',
-      placeholderAr: 'yyyy-mm-dd',
-      type: 'text',
-      required: true,
-    },
-    {
-      name: 'details',
-      labelEn: 'Complaint Details',
-      labelAr: 'اكتب الشكوى',
-      type: 'textarea',
-      required: true,
-    },
-  ],
-},
-
+      // 🟣 Shared Fields (appear in both)
+      {
+        name: 'complainantName',
+        labelEn: 'Complainant Name',
+        labelAr: 'اسم المشتكي',
+        type: 'text',
+        required: true,
+      },
+      {
+        name: 'age',
+        labelEn: 'Age',
+        labelAr: 'العمر',
+        type: 'number',
+        required: true,
+      },
+      {
+        name: 'phone',
+        labelEn: 'In-city Phone Number',
+        labelAr: 'رقم الهاتف في المدينة',
+        type: 'text',
+        required: true,
+      },
+      {
+        name: 'idNumber',
+        labelEn: 'Citizen ID',
+        labelAr: 'رقم الهوية',
+        type: 'text',
+        required: true,
+      },
+      {
+        name: 'incidentDate',
+        labelEn: 'Date of Incident',
+        labelAr: 'تاريخ الحادث المتسبب في الشكوى',
+        placeholderEn: 'yyyy-mm-dd',
+        placeholderAr: 'yyyy-mm-dd',
+        type: 'text',
+        required: true,
+      },
+      {
+        name: 'details',
+        labelEn: 'Complaint Details',
+        labelAr: 'اكتب الشكوى',
+        type: 'textarea',
+        required: true,
+      },
+    ],
+  },
 };
