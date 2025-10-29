@@ -56,7 +56,6 @@ export const CITYHALL: Record<CityhallKey, any> = {
         required: true,
         options: ['Yes', 'No'],
       },
-      
       // ---------------- Project Info ----------------
       {
         name: 'projectName',
