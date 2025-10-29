@@ -30,6 +30,7 @@ export default function Navbar() {
           <Link className="btn btn-ghost" href="/rules">{L.nav.rules}</Link>
           <Link className="btn btn-ghost" href="/jobs">{L.nav.jobs}</Link>
           <Link className="btn btn-ghost" href="/cityhall">{L.nav.cityhall}</Link>
+          <Link className="btn btn-ghost" href="/tickets">{L.nav.tickets}</Link>
           <a className="btn btn-ghost" href={BRAND.store} target="_blank" rel="noreferrer">{L.nav.store}</a>
           <JoinUsCta label={L.hero.ctaJoin} />
         </nav>

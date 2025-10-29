@@ -19,6 +19,7 @@ export function t(lang: Lang) {
       rules: isAr ? 'القوانين' : 'Rules',
       jobs: isAr ? 'تقديم الوظائف' : 'Jobs',
       cityhall : isAr ? 'بلدية' : 'City Hall',
+      tickets : isAr ? 'تذاكر ' : 'Tickets',
       store: isAr ? 'المتجر' : 'Store',
       login: isAr ? 'تسجيل الدخول' : 'Log in',
     },
