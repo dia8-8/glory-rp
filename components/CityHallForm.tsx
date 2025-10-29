@@ -81,7 +81,7 @@ export default function CityHallForm({
     setStatus('loading');
     try {
       const payload = { ...form, discord: discordName };
-      const res = await fetch(`/api/cityhall/${categoryKey}`, {
+      const res = await fetch(`/api/applications/cityhall/${categoryKey}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
