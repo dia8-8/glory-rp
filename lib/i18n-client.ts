@@ -34,8 +34,8 @@ export function tClient(lang: Lang) {
     social: {
       title: isAr ? 'منصات التواصل' : 'Community at a Glance',
       body: isAr
-        ? 'يتمتع مجتمع GLORY LIFE بحضورٍ مميز على منصات التواصل الاجتماعي، ويُعد من أكبر مجتمعات الرول بلاي عالميًا من حيث عدد المتابعين والنشاط. نستقبل يوميًا أعضاءً جدد عبر ديسكورد وتويتر، وتبقى الأجواء داخل المدينة نابضة بالحياة ومتوازنة. كما نفخر بكوننا أول سيرفر عربي يحصل على مساحة مخصّصة على منصة البث Kick.com — خطوة تعكس مكانتنا بين أبرز مجتمعات الرول بلاي في العالم.'
-        : 'The GLORY LIFE community has a standout presence across social platforms—among large RP communities by followers and live activity. On Discord and Twitter we welcome new members daily, and in-city sessions stay lively and balanced. We’re also proud to be the first Arabic server with a dedicated section on Kick.com—a milestone that reflects our place among top RP communities.',
+        ? 'يتمتع مجتمع GLORY RP بحضورٍ مميز على منصات التواصل الاجتماعي، ويُعد من أكبر مجتمعات الرول بلاي عالميًا من حيث عدد المتابعين والنشاط. نستقبل يوميًا أعضاءً جدد عبر ديسكورد، وتبقى الأجواء داخل المدينة نابضة بالحياة ومتوازنة. كما نفخر بمكانتنا بين أبرز مجتمعات الرول بلاي حول العالم.'
+        : 'The GLORY RP community stands out across social platforms as one of the largest RP communities worldwide in followers and activity. We welcome new members daily through Discord, and in-city sessions remain lively and balanced. We take pride in our place among the top RP communities globally.',
       members: isAr ? 'الأعضاء' : 'Members',
       followers: isAr ? 'المتابعين' : 'Followers',
       twitter: isAr ? 'تويتر' : 'Twitter',
