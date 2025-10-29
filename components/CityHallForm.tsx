@@ -14,7 +14,9 @@ type Field = {
   name: string;
   labelEn: string;
   labelAr: string;
-  type: 'text' | 'textarea' | 'email' | 'select' | 'checkbox';
+  placeholderEn?: string;
+  placeholderAr?: string;
+  type: 'text' | 'number' | 'textarea' | 'email' | 'select' | 'checkbox';
   required?: boolean;
   options?: Option[];
 };
@@ -42,7 +44,7 @@ export default function CityHallForm({
   const initial = useMemo(() => {
     const base: Record<string, any> = {};
     for (const f of fields) {
-      base[f.name] = '';
+      base[f.name] = f.type === 'checkbox' ? false : '';
     }
     return base;
   }, [fields]);
@@ -56,7 +58,13 @@ export default function CityHallForm({
   function onChange(
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) {
-    setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
+    const target = e.target as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
+    const { name, value } = target;
+    const isCheckbox = target instanceof HTMLInputElement && target.type === 'checkbox';
+    setForm((f) => ({
+      ...f,
+      [name]: isCheckbox ? target.checked : value,
+    }));
   }
 
   async function onSubmit(e: React.FormEvent) {
@@ -107,34 +115,14 @@ export default function CityHallForm({
         </p>
       </div>
 
-      {/* Dynamic Form Fields */}
+      {/* Dynamic Fields */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         {fields.map((f) => {
           const label = L.isAr ? f.labelAr : f.labelEn;
+          const placeholder = L.isAr ? f.placeholderAr : f.placeholderEn;
 
-          // ----- Checkbox -----
-          if (f.type === 'checkbox') {
-            return (
-              <div key={f.name} className="sm:col-span-2 flex items-center gap-3 mt-2">
-                <input
-                  id={f.name}
-                  name={f.name}
-                  type="checkbox"
-                  checked={!!form[f.name]}
-                  onChange={(e) => setForm((prev) => ({ ...prev, [f.name]: e.target.checked }))}
-                  required={!!f.required}
-                  className="h-5 w-5 accent-[#a60be3] rounded-md border border-white/30 bg-white/10 cursor-pointer"
-                />
-                <label htmlFor={f.name} className="text-sm opacity-90 cursor-pointer select-none">
-                  {label}
-                </label>
-              </div>
-            );
-          }
-
-
-          // ----- Text & Email -----
-          if (f.type === 'text' || f.type === 'email') {
+          // ----- Text / Number / Email -----
+          if (['text', 'number', 'email'].includes(f.type)) {
             return (
               <div key={f.name}>
                 <label className="text-sm opacity-80">{label}</label>
@@ -143,8 +131,27 @@ export default function CityHallForm({
                   type={f.type}
                   value={form[f.name] ?? ''}
                   onChange={onChange}
+                  placeholder={placeholder}
                   required={!!f.required}
-                  className="mt-1 w-full rounded-xl border border-white/15 bg-white/5 px-3 py-2 outline-none focus:border-[#c27cff] focus:ring-1 focus:ring-[#c27cff]"
+                  className="mt-1 w-full rounded-xl border border-white/15 bg-white/5 px-3 py-2 outline-none text-white/90 focus:border-[#a60be3] focus:ring-1 focus:ring-[#a60be3]"
+                />
+              </div>
+            );
+          }
+
+          // ----- Textarea -----
+          if (f.type === 'textarea') {
+            return (
+              <div key={f.name} className="sm:col-span-2">
+                <label className="text-sm opacity-80">{label}</label>
+                <textarea
+                  name={f.name}
+                  rows={5}
+                  value={form[f.name] ?? ''}
+                  onChange={onChange}
+                  required={!!f.required}
+                  placeholder={placeholder}
+                  className="mt-1 w-full rounded-xl border border-white/15 bg-white/5 px-3 py-2 outline-none text-white/90 focus:border-[#a60be3] focus:ring-1 focus:ring-[#a60be3]"
                 />
               </div>
             );
@@ -160,7 +167,7 @@ export default function CityHallForm({
                   value={form[f.name] ?? ''}
                   onChange={onChange}
                   required={!!f.required}
-                  className="mt-1 w-full rounded-xl border border-white/15 bg-[#a60be3]/30 text-white/90 px-3 py-2 outline-none transition focus:border-[#c27cff] focus:ring-1 focus:ring-[#c27cff] appearance-none"
+                  className="mt-1 w-full rounded-xl border border-white/15 bg-[#2a0c4a]/40 text-white/90 px-3 py-2 outline-none transition focus:border-[#c27cff] focus:ring-1 focus:ring-[#c27cff] appearance-none"
                 >
                   <option value="">{L.isAr ? 'اختر' : 'Select'}</option>
                   {f.options?.map((o: any) => {
@@ -188,20 +195,33 @@ export default function CityHallForm({
             );
           }
 
-          // ----- Textarea -----
-          return (
-            <div key={f.name} className="sm:col-span-2">
-              <label className="text-sm opacity-80">{label}</label>
-              <textarea
-                name={f.name}
-                rows={5}
-                value={form[f.name] ?? ''}
-                onChange={onChange}
-                required={!!f.required}
-                className="mt-1 w-full rounded-xl border border-white/15 bg-[#2a0c4a]/40 px-3 py-2 outline-none focus:border-[#c27cff] focus:ring-1 focus:ring-[#c27cff]"
-              />
-            </div>
-          );
+          // ----- Checkbox -----
+          if (f.type === 'checkbox') {
+            return (
+              <div
+                key={f.name}
+                className="sm:col-span-2 flex items-center gap-3 mt-2"
+              >
+                <input
+                  id={f.name}
+                  name={f.name}
+                  type="checkbox"
+                  checked={!!form[f.name]}
+                  onChange={onChange}
+                  required={!!f.required}
+                  className="h-5 w-5 accent-[#a60be3] rounded-md border border-white/30 bg-white/10 cursor-pointer"
+                />
+                <label
+                  htmlFor={f.name}
+                  className="text-sm opacity-90 cursor-pointer select-none"
+                >
+                  {label}
+                </label>
+              </div>
+            );
+          }
+
+          return null;
         })}
       </div>
 
@@ -227,7 +247,7 @@ export default function CityHallForm({
         </button>
       </div>
 
-      {/* Status Message */}
+      {/* Status */}
       {status !== 'idle' && (
         <div
           className={`rounded-xl border px-3 py-2 text-sm ${
