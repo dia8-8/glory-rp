@@ -4,6 +4,7 @@ import { authOptions } from '@/lib/auth';
 import { getLang, t } from '@/lib/i18n-server';
 import { CITYHALL, type CityhallKey } from '@/lib/cityhall';
 import JobApplyForm from '@/components/JobApplyForm';
+import CityHallForm from '@/components/CityHallForm';
 
 export default async function CityhallApplyPage({ params }: { params: { category: string } }) {
   const categoryKey = params.category as CityhallKey;
@@ -30,8 +31,8 @@ export default async function CityhallApplyPage({ params }: { params: { category
           </p>
         </div>
 
-        <JobApplyForm
-          jobKey={categoryKey}
+        <CityHallForm
+          categoryKey={categoryKey}
           fields={category.fields}
           initialLang={lang}
           discordName={discordName}
