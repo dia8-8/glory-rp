@@ -14,7 +14,7 @@ type Field = {
   name: string;
   labelEn: string;
   labelAr: string;
-  type: 'text' | 'textarea' | 'email' | 'select';
+  type: 'text' | 'textarea' | 'email' | 'select' | 'checkbox';
   required?: boolean;
   options?: Option[];
 };
@@ -112,6 +112,27 @@ export default function CityHallForm({
         {fields.map((f) => {
           const label = L.isAr ? f.labelAr : f.labelEn;
 
+          // ----- Checkbox -----
+          if (f.type === 'checkbox') {
+            return (
+              <div key={f.name} className="sm:col-span-2 flex items-center gap-3 mt-2">
+                <input
+                  id={f.name}
+                  name={f.name}
+                  type="checkbox"
+                  checked={!!form[f.name]}
+                  onChange={(e) => setForm((prev) => ({ ...prev, [f.name]: e.target.checked }))}
+                  required={!!f.required}
+                  className="h-5 w-5 accent-[#a60be3] rounded-md border border-white/30 bg-white/10 cursor-pointer"
+                />
+                <label htmlFor={f.name} className="text-sm opacity-90 cursor-pointer select-none">
+                  {label}
+                </label>
+              </div>
+            );
+          }
+
+
           // ----- Text & Email -----
           if (f.type === 'text' || f.type === 'email') {
             return (
@@ -177,7 +198,7 @@ export default function CityHallForm({
                 value={form[f.name] ?? ''}
                 onChange={onChange}
                 required={!!f.required}
-                className="mt-1 w-full rounded-xl border border-white/15 bg-white/5 px-3 py-2 outline-none focus:border-[#c27cff] focus:ring-1 focus:ring-[#c27cff]"
+                className="mt-1 w-full rounded-xl border border-white/15 bg-[#2a0c4a]/40 px-3 py-2 outline-none focus:border-[#c27cff] focus:ring-1 focus:ring-[#c27cff]"
               />
             </div>
           );

@@ -135,15 +135,11 @@ export const CITYHALL: Record<CityhallKey, any> = {
       {
         name: 'confirmation',
         labelEn:
-          'I confirm all information above is correct and I accept full legal responsibility for any false statements.',
+          'I confirm that all the above information is correct and I accept full legal responsibility for any false statements.',
         labelAr:
           'أقرّ بأن جميع المعلومات المذكورة أعلاه صحيحة، وأتحمل المسؤولية القانونية الكاملة في حال ثبوت خلاف ذلك.',
-        type: 'select',
+        type: 'checkbox',
         required: true,
-        options: [
-          { value: 'yes', labelEn: 'Yes', labelAr: 'نعم' },
-          { value: 'no', labelEn: 'No', labelAr: 'لا' },
-        ],
       },
       {
         name: 'submissionDate',
