@@ -18,10 +18,22 @@ export async function POST(req: Request, { params }: { params: { job: string } }
     const payload = await req.json().catch(() => ({}));
 
     // Validate required fields (ignore hidden ones)
+    // Validate required fields (ignore hidden ones based on complaintType)
     const missing = category.fields
-      .filter((f: any) => f.required)
-      .filter((f: any) => !payload[f.name] && payload[f.name] !== 0)
+      .filter((f: any) => {
+        if (!f.required) return false;
+
+        // If complaint form — skip group fields that don't match
+        if (categoryKey === 'complaint' && f.group) {
+          if (payload.complaintType === 'government' && f.group !== 'government') return false;
+          if (payload.complaintType === 'project' && f.group !== 'project') return false;
+        }
+
+        // Still required but missing value
+        return !payload[f.name] && payload[f.name] !== 0;
+      })
       .map((f: any) => f.name);
+
 
     if (missing.length) {
       return NextResponse.json({ error: `Missing required: ${missing.join(', ')}` }, { status: 400 });
@@ -49,17 +61,24 @@ export async function POST(req: Request, { params }: { params: { job: string } }
       return '```' + raw.slice(0, FIELD_VALUE_LIMIT - 6) + '```';
     };
 
-    const inlineFields = Object.entries(payload)
-      .map(([key, val]) => {
-        const text = String(val ?? '').trim();
-        const isMultiline = text.includes('\n') || text.length > 150;
+    const inlineFields = category.fields
+      .map((f: any) => {
+        const val = payload[f.name];
+        if (val === undefined || val === null || val === '') return null;
+
+        const text = String(val).trim();
+        const isTextarea = f.type === 'textarea';
+        const isMultiline = text.includes('\n') || text.length > 150 || isTextarea;
+
         return {
-          name: trim(key, 256),
+          name: trim(f.labelEn || f.name, 256),
           value: wrapInlineCode(text),
-          inline: !isMultiline,
+          inline: !isMultiline, // ✅ textarea always false
         };
       })
-      .filter((f) => f.name && f.value);
+      .filter(Boolean)
+      .slice(0, 25);
+
 
     const embed: any = {
       title:
