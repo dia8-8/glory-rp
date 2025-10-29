@@ -20,15 +20,6 @@ export default async function JobApplyPage({ params }: { params: { job: string }
 
   return (
     <div className="relative w-full min-h-[100svh] bg-[#170930]">
-      {/*
-      <div
-        className="absolute inset-0 -z-10 bg-cover bg-center md:bg-fixed"
-        style={{ backgroundImage: "url('/bg.png')" }}
-        aria-hidden
-      />
-      <div className="absolute inset-0 -z-10 bg-black/50" aria-hidden />
-      */}
-
       <main className="mx-auto max-w-3xl px-4 pb-14 pt-24 sm:pt-28 md:pt-32">
         <div className="mx-auto mb-8 max-w-2xl text-center">
           <h1 className="text-3xl font-extrabold sm:text-4xl md:text-5xl">
