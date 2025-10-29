@@ -50,6 +50,15 @@ export default function CityHallForm({
   }, [fields]);
 
   const [form, setForm] = useState<Record<string, any>>(initial);
+
+  const visibleFields = useMemo(() => {
+    return fields.filter((f: any) => {
+      if (!f.showIf) return true;
+      const [depField, expected] = Object.entries(f.showIf)[0];
+      return form[depField] === expected;
+    });
+  }, [fields, form]);
+
   useEffect(() => setForm(initial), [initial]);
 
   const [status, setStatus] = useState<'idle' | 'loading' | 'ok' | 'err'>('idle');
@@ -117,7 +126,7 @@ export default function CityHallForm({
 
       {/* Dynamic Fields */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        {fields.map((f) => {
+        {visibleFields.map((f) => {
           const label = L.isAr ? f.labelAr : f.labelEn;
           const placeholder = L.isAr ? f.placeholderAr : f.placeholderEn;
 
@@ -191,6 +200,9 @@ export default function CityHallForm({
                     );
                   })}
                 </select>
+                {f.name === 'complaintType' && form.complaintType && (
+                  <div className="col-span-2 border-t border-white/10 my-2" />
+                )}
               </div>
             );
           }
