@@ -6,12 +6,12 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { CITYHALL, type CityhallKey } from '@/lib/cityhall';
 
-export async function POST(req: Request, { params }: { params: { category: string } }) {
+export async function POST(req: Request, { params }: { params: { job: string } }) {
   try {
     const session = await getServerSession(authOptions);
     if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-    const categoryKey = params.category as CityhallKey;
+    const categoryKey = params.job as CityhallKey;
     const category = CITYHALL[categoryKey];
     if (!category) return NextResponse.json({ error: 'Unknown category' }, { status: 404 });
 
