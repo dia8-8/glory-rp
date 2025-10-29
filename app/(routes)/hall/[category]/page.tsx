@@ -3,7 +3,6 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { getLang, t } from '@/lib/i18n-server';
 import { CITYHALL, type CityhallKey } from '@/lib/cityhall';
-import JobApplyForm from '@/components/JobApplyForm';
 import CityHallForm from '@/components/CityHallForm';
 
 export default async function CityhallApplyPage({ params }: { params: { category: string } }) {
