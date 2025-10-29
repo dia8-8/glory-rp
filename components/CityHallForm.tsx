@@ -167,9 +167,12 @@ export default function CityHallForm({
           }
 
           // ----- Select -----
+          // ----- Select -----
           if (f.type === 'select') {
+            // Make "complaintType" full-width row
+            const fullWidth = f.name === 'complaintType' ? 'sm:col-span-2' : '';
             return (
-              <div key={f.name}>
+              <div key={f.name} className={fullWidth}>
                 <label className="text-sm opacity-80">{label}</label>
                 <select
                   name={f.name}
