@@ -6,13 +6,17 @@ import type { CityhallKey } from '@/lib/cityhall';
 
 type Lang = 'ar' | 'en';
 
+type Option =
+  | string
+  | { value: string; labelEn: string; labelAr: string };
+
 type Field = {
   name: string;
   labelEn: string;
   labelAr: string;
   type: 'text' | 'textarea' | 'email' | 'select';
   required?: boolean;
-  options?: string[];
+  options?: Option[];
 };
 
 export default function CityHallForm({
@@ -30,7 +34,8 @@ export default function CityHallForm({
   const [lang, setLang] = useState<Lang>(initialLang);
   useEffect(() => {
     const m = document.cookie.match(/(?:^|; )lang=(ar|en)/);
-    if (m && (m[1] === 'ar' || m[1] === 'en') && m[1] !== lang) setLang(m[1] as Lang);
+    if (m && (m[1] === 'ar' || m[1] === 'en') && m[1] !== lang)
+      setLang(m[1] as Lang);
   }, [lang]);
   const L = T(lang);
 
@@ -59,7 +64,6 @@ export default function CityHallForm({
     setStatus('loading');
     try {
       const payload = { ...form, discord: discordName };
-
       const res = await fetch(`/api/cityhall/${categoryKey}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -84,6 +88,7 @@ export default function CityHallForm({
 
   return (
     <form onSubmit={onSubmit} className="space-y-4">
+      {/* Discord Account */}
       <div>
         <label className="text-sm opacity-80">
           {L.isAr ? 'حساب الديسكورد' : 'Discord Account'}
@@ -102,9 +107,12 @@ export default function CityHallForm({
         </p>
       </div>
 
+      {/* Dynamic Form Fields */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         {fields.map((f) => {
           const label = L.isAr ? f.labelAr : f.labelEn;
+
+          // ----- Text & Email -----
           if (f.type === 'text' || f.type === 'email') {
             return (
               <div key={f.name}>
@@ -115,12 +123,13 @@ export default function CityHallForm({
                   value={form[f.name] ?? ''}
                   onChange={onChange}
                   required={!!f.required}
-                  className="mt-1 w-full rounded-xl border border-white/15 bg-white/5 px-3 py-2 outline-none focus:border-white/30"
+                  className="mt-1 w-full rounded-xl border border-white/15 bg-white/5 px-3 py-2 outline-none focus:border-[#c27cff] focus:ring-1 focus:ring-[#c27cff]"
                 />
               </div>
             );
           }
 
+          // ----- Select -----
           if (f.type === 'select') {
             return (
               <div key={f.name}>
@@ -130,19 +139,35 @@ export default function CityHallForm({
                   value={form[f.name] ?? ''}
                   onChange={onChange}
                   required={!!f.required}
-                   className="mt-1 w-full rounded-xl border border-white/15 bg-white/5 text-white/90 px-3 py-2 outline-none transition focus:border-[#c27cff] focus:ring-1 focus:ring-[#c27cff] appearance-none"
+                  className="mt-1 w-full rounded-xl border border-white/15 bg-[#a60be3]/30 text-white/90 px-3 py-2 outline-none transition focus:border-[#c27cff] focus:ring-1 focus:ring-[#c27cff] appearance-none"
                 >
                   <option value="">{L.isAr ? 'اختر' : 'Select'}</option>
-                  {f.options?.map((o) => (
-                    <option key={o} value={o}>
-                      {o}
-                    </option>
-                  ))}
+                  {f.options?.map((o: any) => {
+                    const value = typeof o === 'string' ? o : o.value;
+                    const labelText =
+                      typeof o === 'string'
+                        ? (L.isAr
+                            ? o === 'Yes'
+                              ? 'نعم'
+                              : o === 'No'
+                              ? 'لا'
+                              : o
+                            : o)
+                        : L.isAr
+                        ? o.labelAr
+                        : o.labelEn;
+                    return (
+                      <option key={value} value={value}>
+                        {labelText}
+                      </option>
+                    );
+                  })}
                 </select>
               </div>
             );
           }
 
+          // ----- Textarea -----
           return (
             <div key={f.name} className="sm:col-span-2">
               <label className="text-sm opacity-80">{label}</label>
@@ -152,13 +177,14 @@ export default function CityHallForm({
                 value={form[f.name] ?? ''}
                 onChange={onChange}
                 required={!!f.required}
-                className="mt-1 w-full rounded-xl border border-white/15 bg-white/5 px-3 py-2 outline-none focus:border-white/30"
+                className="mt-1 w-full rounded-xl border border-white/15 bg-white/5 px-3 py-2 outline-none focus:border-[#c27cff] focus:ring-1 focus:ring-[#c27cff]"
               />
             </div>
           );
         })}
       </div>
 
+      {/* Submit */}
       <div className="flex items-center justify-between gap-3">
         <div className="text-xs opacity-70">
           {L.isAr
@@ -180,6 +206,7 @@ export default function CityHallForm({
         </button>
       </div>
 
+      {/* Status Message */}
       {status !== 'idle' && (
         <div
           className={`rounded-xl border px-3 py-2 text-sm ${
