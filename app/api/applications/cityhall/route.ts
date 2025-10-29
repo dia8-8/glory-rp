@@ -59,8 +59,8 @@ export async function POST(req: Request, { params }: { params: { category: strin
   const embed: any = {
     title:
       categoryKey === 'business'
-        ? '🏢 New Business Application'
-        : '🧾 New Complaint Submission',
+        ? 'New Business Application'
+        : 'New Complaint Submission',
     color: categoryKey === 'business' ? 0x00bcd4 : 0xff5555,
     timestamp: new Date().toISOString(),
     fields: inlineFields.slice(0, 25),
