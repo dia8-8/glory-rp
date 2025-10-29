@@ -18,7 +18,7 @@ export function t(lang: Lang) {
       streamers: isAr ? 'صناع المحتوى' : 'Streamers',
       rules: isAr ? 'القوانين' : 'Rules',
       jobs: isAr ? 'تقديم الوظائف' : 'Jobs',
-      hall : isAr ? 'بلدية' : 'City Hall',
+      cityhall : isAr ? 'بلدية' : 'City Hall',
       store: isAr ? 'المتجر' : 'Store',
       login: isAr ? 'تسجيل الدخول' : 'Log in',
     },
