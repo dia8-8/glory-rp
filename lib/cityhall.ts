@@ -10,6 +10,7 @@ export const CITYHALL: Record<CityhallKey, any> = {
     descAr:
       'قدّم طلب ترخيص تجاري داخل المدينة. يُرجى تعبئة جميع البيانات المطلوبة بدقة.',
     webhookEnv: 'DISCORD_CITYHALL_BUSINESS_WEBHOOK',
+    mentionRoleId: process.env.DISCORD_ROLEID_BUSINESS, // ✅ new
     fields: [
       {
         name: 'fullName',
@@ -67,6 +68,7 @@ export const CITYHALL: Record<CityhallKey, any> = {
     descAr:
       'أبلِغ عن مشكلة أو مخالفة إلى بلدية المدينة. يُرجى وصف حالتك بالتفصيل.',
     webhookEnv: 'DISCORD_CITYHALL_COMPLAINT_WEBHOOK',
+    mentionRoleId: process.env.DISCORD_ROLEID_COMPLAINT, // ✅ new
     fields: [
       {
         name: 'subject',
@@ -97,4 +99,3 @@ export const CITYHALL: Record<CityhallKey, any> = {
     ],
   },
 };
-

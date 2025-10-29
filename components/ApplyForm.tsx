@@ -103,7 +103,7 @@ export default function ApplyForm({
         <div>
           <label className="text-sm opacity-80">{isAr ? 'هل لديك مايكروفون؟' : 'Do you have a microphone?'}</label>
           <select name="mic" value={form.mic} onChange={onChange}
-                  className="mt-1 w-full rounded-xl border border-white/15 bg-[#2a0c4a]/60 text-white/90 px-3 py-2 outline-none transition focus:border-[#a60be3] focus:ring-1 focus:ring-[#a60be3]">
+                  className="mt-1 w-full rounded-xl border border-white/15 bg-[#a60be3]/80 text-white/90 px-3 py-2 outline-none transition focus:border-[#c27cff] focus:ring-1 focus:ring-[#c27cff] appearance-none custom-select">
             <option value="yes">{isAr ? 'نعم' : 'Yes'}</option>
             <option value="no">{isAr ? 'لا' : 'No'}</option>
           </select>
