@@ -24,8 +24,6 @@ export default function ApplyForm({
   const [form, setForm] = useState({
     name: '',
     age: '',
-    timezone: '',
-    hours: '',
     experience: '',
     mic: 'yes',
     rulesOk: false,
@@ -58,7 +56,7 @@ export default function ApplyForm({
       if (!res.ok) throw new Error(j.error || 'Failed');
       setStatus('ok');
       setMsg(isAr ? 'تم إرسال المقابلة! سنراجعها قريبًا.' : 'Interview sent! We’ll review it soon.');
-      setForm({ name:'', age: '', timezone: '', hours: '', experience: '', mic: 'yes', rulesOk: false, steam: '', about: '' });
+      setForm({ name:'', age: '', experience: '', mic: 'yes', rulesOk: false, steam: '', about: '' });
     } catch (err:any) {
       setStatus('err'); setMsg(err.message || 'Error');
     }
