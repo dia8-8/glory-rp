@@ -8,7 +8,7 @@ export const metadata = {
 
 export default function VipShopPage() {
   return (
-    <main className="min-h-screen flex flex-col items-center bg-[#170930] text-white font-[Poppins,sans-serif]">
+    <main className="relative w-full min-h-[100svh] bg-[#170930]">
       {/* Header */}
       <header className="text-center py-8">
         <h1 className="text-4xl font-extrabold text-[#b841e4]">
