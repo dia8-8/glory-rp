@@ -8,18 +8,11 @@ export const metadata = {
 
 export default function VipShopPage() {
   return (
-    <main className="min-h-screen flex flex-col items-center bg-[#0e0e0e] text-white font-[Poppins,sans-serif]">
+    <main className="min-h-screen flex flex-col items-center bg-[#170930] text-white font-[Poppins,sans-serif]">
       {/* Header */}
       <header className="text-center py-8">
-        <Image
-          src="/logo.png"
-          alt="Glory RP Logo"
-          width={150}
-          height={150}
-          className="mx-auto mb-3"
-        />
         <h1 className="text-4xl font-extrabold text-[#b841e4]">
-          Glory RP - VIP Shop
+          VIP Shop
         </h1>
       </header>
 
@@ -51,16 +44,15 @@ export default function VipShopPage() {
 
       {/* Instructions */}
       <p className="text-center text-sm text-[#aaa] my-6 px-4">
-        To purchase VIP, please join our Discord server and open a ticket.
+        To purchase VIP, please fill the form in the link below.
       </p>
 
       {/* Discord Button */}
       <Link
-        href="https://discord.gg/7w7bvb8PM3"
-        target="_blank"
+        href="/tickets/vip"
         className="bg-[#7289da] hover:bg-[#5b6eae] text-white text-lg px-8 py-3 rounded-md mb-6 transition-colors duration-200"
       >
-        Join Our Discord
+        Open Form
       </Link>
 
       {/* Footer */}
