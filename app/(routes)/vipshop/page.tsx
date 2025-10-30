@@ -79,7 +79,7 @@ const VIP_ITEMS = [
   { name: "Car", image: "/images/car.jpg", price1: "$40 Per Season", price2: "$5 Monthly" },
   { name: "Gang (6 Cars + Villa)", image: "/images/gang.jpg", price1: "$100 First Payment + $20 Monthly" },
   { name: "Supermarket", image: "/images/supermarket.jpg", price1: "$10 Monthly" },
-  { name: "Gas Station", image: "/images/gasstation.jpg", price1: "$50" },
+  { name: "Gas Station", image: "/images/gasstation.jpg", price1: "$15 Monthly" },
   { name: "Mechanic", image: "/images/mechanic.jpg", price1: "$100 First Payment + $15 Monthly", soldOut: true },
   { name: "Restaurant", image: "/images/restaurant.jpg", price1: "$50 First Payment + $10 Monthly" },
   { name: "Casino", image: "/images/casino.jpg", price1: "$300 First Payment + $20 Monthly" },
