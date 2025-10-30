@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { STREAMERS } from "@/data/streamers";
-import { t, getLang } from "@/lib/i18n-server";
+import { tClient as t, getLangClient as getLang } from '@/lib/i18n-client';
 import Reveal from "@/components/Reveal";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
