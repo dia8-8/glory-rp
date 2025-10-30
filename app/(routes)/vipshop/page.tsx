@@ -12,7 +12,7 @@ export default function VipShopPage() {
       <div className="mx-auto max-w-7xl px-4 pb-16 pt-24 sm:pt-28 md:pt-32">
         {/* Header */}
         <header className="text-center mb-8">
-          <h1 className="text-4xl font-extrabold text-[#b841e4]">
+          <h1 className="text-4xl font-extrabold text-white">
             VIP Shop
           </h1>
           <p className="mt-3 text-base text-white/80">
