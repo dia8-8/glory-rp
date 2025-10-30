@@ -28,7 +28,7 @@ export function t(lang: Lang) {
       ctaRules: isAr ? 'اطّلع على القوانين' : 'View Rules',
     },
     live: {
-      title: isAr ? 'شاهد أفضل البثوث' : 'Watch Top Streams',
+      title: isAr ? 'شاهد أفضل البثوث لدينا' : 'Watch Our Top Streams',
       subtitle: isAr ? 'تابع أبرز صناع المحتوى للأحداث المميزة.' : 'Catch creators covering the city’s biggest moments.',
     },
     social: {
