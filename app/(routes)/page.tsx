@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { tClient as t, getLangClient as getLang } from '@/lib/i18n-client';
+import { tClient as t, getLangClient as getLang } from "@/lib/i18n-client";
 import { BRAND } from "@/lib/brand";
 import Stat from "@/components/Stat";
 import { STREAMERS } from "@/data/streamers";
@@ -58,38 +58,51 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* STREAMERS SECTION */}
+      {/* STREAMERS SECTION (10 visible, with controls) */}
       <hr className="h-px border-0 bg-[#a865fa]" />
-      <section className="relative w-full bg-[#170930] pt-12 pb-20">
-        <Particles className="z-0" quantity={70} color="#ffffff" opacity={0.45} linkDistance={80} />
+      <section className="relative w-full bg-[#170930] pt-12 pb-20 overflow-hidden">
+        <Particles
+          className="z-0"
+          quantity={70}
+          color="#ffffff"
+          opacity={0.45}
+          linkDistance={80}
+        />
+
         <div className="relative z-10 mx-auto mt-6 max-w-7xl px-4 text-center">
           <Reveal>
-            <h2 className="text-3xl font-extrabold sm:text-4xl md:text-5xl">{L.live.title}</h2>
+            <h2 className="text-3xl font-extrabold sm:text-4xl md:text-5xl">
+              {L.live.title}
+            </h2>
           </Reveal>
           <Reveal delay={0.08}>
             <p className="mt-3 text-base text-white/80">{L.live.subtitle}</p>
           </Reveal>
 
-          {/* STREAMERS SLIDER */}
           <div className="relative mt-10 flex flex-col items-center">
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-6 transition-all duration-500 ease-in-out">
-              {current.map((s) => (
-                <a
-                  key={s.name + s.link}
-                  href={s.link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="group flex flex-col items-center text-center transition-transform hover:scale-105"
-                >
-                  <img
-                    src={s.avatar}
-                    alt={s.name}
-                    className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-full border-2 border-[#b841e4] object-cover shadow-lg group-hover:shadow-[#b841e4]/50 transition"
-                  />
-                  <p className="mt-3 text-sm sm:text-base font-semibold group-hover:text-[#b841e4] transition">
-                    {s.name}
-                  </p>
-                </a>
+            {/* STREAMERS GRID */}
+            <div
+              key={page}
+              className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-6 transition-opacity duration-500 ease-in-out"
+            >
+              {current.map((s, i) => (
+                <Reveal key={s.name + i} delay={i * 0.05}>
+                  <a
+                    href={s.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group flex flex-col items-center text-center transition-transform hover:scale-105"
+                  >
+                    <img
+                      src={s.avatar}
+                      alt={s.name}
+                      className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-full border-2 border-[#b841e4] object-cover shadow-lg group-hover:shadow-[#b841e4]/50 transition"
+                    />
+                    <p className="mt-3 text-sm sm:text-base font-semibold group-hover:text-[#b841e4] transition">
+                      {s.name}
+                    </p>
+                  </a>
+                </Reveal>
               ))}
             </div>
 
@@ -124,7 +137,9 @@ export default function HomePage() {
       <section className="relative mx-auto max-w-7xl px-4 py-16">
         <div className="mx-auto mb-8 max-w-3xl text-center">
           <Reveal>
-            <h2 className="text-3xl font-extrabold sm:text-4xl md:text-5xl">{L.social.title}</h2>
+            <h2 className="text-3xl font-extrabold sm:text-4xl md:text-5xl">
+              {L.social.title}
+            </h2>
           </Reveal>
           <Reveal delay={0.08}>
             <p className="mt-3 text-base text-white/80">{L.social.body}</p>
@@ -142,10 +157,20 @@ export default function HomePage() {
 
         <Reveal delay={0.18}>
           <div className="mt-6 flex flex-wrap gap-3 text-sm">
-            <a href={BRAND.tiktok} target="_blank" rel="noreferrer" className="btn btn-ghost">
+            <a
+              href={BRAND.tiktok}
+              target="_blank"
+              rel="noreferrer"
+              className="btn btn-ghost"
+            >
               {L.social.tiktok}
             </a>
-            <a href={BRAND.discord} target="_blank" rel="noreferrer" className="btn btn-ghost">
+            <a
+              href={BRAND.discord}
+              target="_blank"
+              rel="noreferrer"
+              className="btn btn-ghost"
+            >
               {L.social.discord}
             </a>
           </div>
@@ -153,10 +178,15 @@ export default function HomePage() {
       </section>
 
       {/* ABOUT / RULES CTA */}
-      <section id="rules-home" className="relative mx-auto max-w-7xl px-4 py-16 scroll-mt-28">
+      <section
+        id="rules-home"
+        className="relative mx-auto max-w-7xl px-4 py-16 scroll-mt-28"
+      >
         <div className="mx-auto mb-8 max-w-3xl text-center pb-12">
           <Reveal>
-            <h2 className="text-3xl font-extrabold sm:text-4xl md:text-5xl">{L.about.title}</h2>
+            <h2 className="text-3xl font-extrabold sm:text-4xl md:text-5xl">
+              {L.about.title}
+            </h2>
           </Reveal>
           <Reveal delay={0.08}>
             <p className="mt-3 text-base text-white/80">{L.about.body}</p>
@@ -164,12 +194,14 @@ export default function HomePage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch">
-          {/* ABOUT CARD */}
           <Reveal>
-            <InfoCard icon={<Info className="h-7 w-7 text-white/70" />} title={L.about.title} desc={L.about.body} />
+            <InfoCard
+              icon={<Info className="h-7 w-7 text-white/70" />}
+              title={L.about.title}
+              desc={L.about.body}
+            />
           </Reveal>
 
-          {/* RULES CARD */}
           <Reveal delay={0.08}>
             <InfoCard
               icon={<BookOpen className="h-7 w-7 text-white/70" />}
@@ -180,7 +212,6 @@ export default function HomePage() {
             />
           </Reveal>
 
-          {/* COMMUNITY CARD */}
           <Reveal delay={0.16}>
             <InfoCard
               icon={<Users className="h-7 w-7 text-white/70" />}
@@ -191,7 +222,9 @@ export default function HomePage() {
                   : "Our community is active daily with a strong presence across platforms."
               }
               link={BRAND.discord}
-              linkLabel={L.isAr ? "الدخول إلى الديسكورد" : "Enter our Discord"}
+              linkLabel={
+                L.isAr ? "الدخول إلى الديسكورد" : "Enter our Discord"
+              }
             />
           </Reveal>
         </div>
