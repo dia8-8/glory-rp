@@ -3,15 +3,16 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { getLang, t } from '@/lib/i18n-server';
 import { TICKETS, type TicketKey } from '@/lib/tickets';
-import TicketsForm from '@/components/TicketsForm'; // ✅ use your TicketsForm
+import TicketsForm from '@/components/TicketsForm';
 
 export default async function TicketPage({ params }: { params: { category: string } }) {
-  const ticketKey = params.category as TicketKey;
-  const ticket = TICKETS[ticketKey];
+  const categoryKey = params.category as TicketKey;
+  const ticket = TICKETS[categoryKey];
   if (!ticket) return notFound();
 
+  // 🔒 Require sign-in
   const session = await getServerSession(authOptions);
-  if (!session) redirect(`/signin?callbackUrl=/tickets/${ticketKey}`);
+  if (!session) redirect(`/signin?callbackUrl=/tickets/${categoryKey}`);
 
   const discordName = session.user?.name || '';
   const lang = getLang();
@@ -32,7 +33,7 @@ export default async function TicketPage({ params }: { params: { category: strin
 
         {/* ✅ Use your TicketsForm here */}
         <TicketsForm
-          categoryKey={ticketKey}
+          categoryKey={categoryKey}
           fields={ticket.fields}
           initialLang={lang}
           discordName={discordName}
