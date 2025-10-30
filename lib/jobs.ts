@@ -27,7 +27,7 @@ export const JOBS: Record<JobKey, {
     descEn: 'Serve and protect the city. Training provided; experience preferred.',
     descAr: 'خدمة وحماية المدينة. توجد تدريبات، والخبرة ميزة.',
     embedImage: '/bg.png', 
-    mentionRoleId: '1427851125830451210',
+    mentionRoleId: '1431266571543777381',
     fields: [
       { type: 'text', name: 'discord', required: true, labelEn: 'Discord', labelAr: 'دسكورد', placeholderEn: 'username', placeholderAr: 'اسم المستخدم' },
       { type: 'text', name: 'name', required: true, labelEn: 'Full Name', labelAr: 'الاسم الكامل' },
