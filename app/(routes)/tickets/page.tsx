@@ -1,4 +1,7 @@
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
 import { getLang } from '@/lib/i18n-server';
 import { t } from '@/lib/i18n';
 import { TICKETS } from '@/lib/tickets';
@@ -12,7 +15,11 @@ const ICONS: Record<string, any> = {
   player: Users,
 };
 
-export default function TicketsIndexPage() {
+export default async function TicketsIndexPage() {
+  // 🔒 Require login
+  const session = await getServerSession(authOptions);
+  if (!session) redirect('/signin?callbackUrl=/tickets');
+
   const lang = getLang();
   const L = t(lang);
   const isAr = L.isAr;
@@ -20,7 +27,6 @@ export default function TicketsIndexPage() {
   return (
     <main className="relative w-full min-h-[100svh] bg-[#170930]">
       <div className="mx-auto max-w-7xl px-4 pb-16 pt-24 sm:pt-28 md:pt-32">
-        {/* Header */}
         <div className="mx-auto mb-8 max-w-3xl text-center">
           <h2 className="text-3xl font-extrabold sm:text-4xl md:text-5xl">
             {isAr ? 'تذاكر الدعم' : 'Support Tickets'}
@@ -32,7 +38,6 @@ export default function TicketsIndexPage() {
           </p>
         </div>
 
-        {/* Ticket Cards */}
         <div className="grid grid-cols-1 gap-16 sm:grid-cols-2 pt-8">
           {Object.values(TICKETS).map((ticket, i) => {
             const Icon = ICONS[ticket.slug] ?? Server;

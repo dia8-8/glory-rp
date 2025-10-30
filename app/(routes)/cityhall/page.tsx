@@ -1,4 +1,7 @@
 import Link from 'next/link';
+import { notFound, redirect } from 'next/navigation';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
 import { getLang } from '@/lib/i18n-server';
 import { t } from '@/lib/i18n';
 import { CITYHALL } from '@/lib/cityhall';
@@ -10,7 +13,11 @@ const ICONS: Record<string, any> = {
   complaint: FileText,
 };
 
-export default function CityhallIndexPage() {
+export default async function CityhallIndexPage() {
+  // 🔒 Require login
+  const session = await getServerSession(authOptions);
+  if (!session) redirect('/signin?callbackUrl=/cityhall');
+
   const lang = getLang();
   const L = t(lang);
   const isAr = L.isAr;
@@ -23,7 +30,9 @@ export default function CityhallIndexPage() {
             {isAr ? 'البلدية' : 'City Hall'}
           </h2>
           <p className="mt-3 text-base text-white/80">
-            {isAr ? 'قدّم شكوى أو طلب عمل تجاري بسهولة.' : 'Submit a complaint or apply for a business with ease.'}
+            {isAr
+              ? 'قدّم شكوى أو طلب عمل تجاري بسهولة.'
+              : 'Submit a complaint or apply for a business with ease.'}
           </p>
         </div>
 
@@ -39,7 +48,10 @@ export default function CityhallIndexPage() {
                   <div className="absolute -top-7 left-1/2 -translate-x-1/2">
                     <div
                       className="flex h-14 w-14 items-center justify-center rounded-2xl ring-2 ring-white/20 shadow-xl"
-                      style={{ background: 'linear-gradient(135deg, var(--brand-from), var(--brand-to))' }}
+                      style={{
+                        background:
+                          'linear-gradient(135deg, var(--brand-from), var(--brand-to))',
+                      }}
                       aria-hidden
                     >
                       <Icon className="h-7 w-7 text-white/80" />
