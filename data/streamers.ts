@@ -10,4 +10,6 @@ export const STREAMERS = [
   { name: 'Mo3oss', avatar: 'https://files.kick.com/images/user/34839439/profile_image/conversion/a050c1cc-18c6-4812-bbb8-7462a9070714-fullsize.webp', link: 'https://kick.com/mo3oss' },
   { name: '3awaddyy', avatar: 'https://files.kick.com/images/user/34839439/profile_image/conversion/a050c1cc-18c6-4812-bbb8-7462a9070714-fullsize.webp', link: 'https://kick.com/3awaddyy' },
   { name: 'Alfredo', avatar: 'https://p16-sign-sg.tiktokcdn.com/tos-alisg-avt-0068/63233335bdf5115e501d49930422b0b1~tplv-tiktokx-cropcenter:1080:1080.jpeg', link: 'https://www.tiktok.com/@alfredo_ex?lang=en' },
+  { name: 'Alfredo', avatar: 'https://static-cdn.jtvnw.net/jtv_user_pictures/4be7b628-5848-4292-90a3-3a9965446488-profile_image-70x70.png', link: 'https://www.twitch.tv/reboo0' },
+
 ];
