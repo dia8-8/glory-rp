@@ -61,11 +61,6 @@ export default function VipShopPage() {
           </Link>
         </div>
       </div>
-
-      {/* Footer */}
-      <footer className="mt-auto py-6 text-[#555] text-xs text-center">
-        © 2025 Glory RP. All rights reserved.
-      </footer>
     </main>
   );
 }
