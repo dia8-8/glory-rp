@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { t, getLang } from "@/lib/i18n-server";
+import { tClient as t, getLangClient as getLang } from '@/lib/i18n-client';
 import { BRAND } from "@/lib/brand";
 import Stat from "@/components/Stat";
 import { STREAMERS } from "@/data/streamers";
