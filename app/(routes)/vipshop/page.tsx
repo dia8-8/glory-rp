@@ -55,7 +55,7 @@ export default function VipShopPage() {
         <div className="flex justify-center">
           <Link
             href="/tickets/vip"
-            className="bg-[#7289da] hover:bg-[#5b6eae] text-white text-lg px-8 py-3 rounded-md mb-6 transition-colors duration-200"
+            className="bg-[#bb47e6] hover:bg-[#5b6eae] text-white text-lg px-8 py-3 rounded-md mb-6 transition-colors duration-200"
           >
             Open Form
           </Link>
