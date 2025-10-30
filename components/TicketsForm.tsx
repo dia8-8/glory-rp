@@ -26,23 +26,26 @@ export default function TicketForm({
   fields,
   initialLang,
   discordName,
+  user,
 }: {
   categoryKey: TicketKey;
   fields: Field[];
   initialLang: Lang;
   discordName: string;
+  user?: { email?: string | null };
 }) {
+
   const [lang, setLang] = useState<Lang>(initialLang);
   const L = T(lang);
 
-  // Detect language from cookie
+  // 🌐 Detect language from cookie
   useEffect(() => {
     const m = document.cookie.match(/(?:^|; )lang=(ar|en)/);
     if (m && (m[1] === 'ar' || m[1] === 'en') && m[1] !== lang)
       setLang(m[1] as Lang);
   }, [lang]);
 
-  // Initialize fields
+  // 🧩 Initialize field defaults
   const initial = useMemo(() => {
     const base: Record<string, any> = {};
     for (const f of fields) base[f.name] = f.type === 'checkbox' ? false : '';
@@ -50,20 +53,27 @@ export default function TicketForm({
   }, [fields]);
 
   const [form, setForm] = useState<Record<string, any>>(initial);
+  const [formKey, setFormKey] = useState(0);
+
   useEffect(() => setForm(initial), [initial]);
 
   const [status, setStatus] = useState<'idle' | 'loading' | 'ok' | 'err'>('idle');
   const [msg, setMsg] = useState('');
 
+  // 🔧 Input change handler (safe for all input types)
   function onChange(
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) {
-    const target = e.target as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
-    const { name, value } = target;
-    const isCheckbox = target instanceof HTMLInputElement && target.type === 'checkbox';
-    setForm((f) => ({ ...f, [name]: isCheckbox ? target.checked : value }));
+    const target = e.target;
+    const { name } = target;
+    const value =
+      target instanceof HTMLInputElement && target.type === 'checkbox'
+        ? target.checked
+        : target.value;
+    setForm((f) => ({ ...f, [name]: value }));
   }
 
+  // 🚀 Submit
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setStatus('loading');
@@ -85,7 +95,10 @@ export default function TicketForm({
           ? 'تم إرسال التذكرة بنجاح! سيتم مراجعتها قريباً.'
           : 'Ticket submitted successfully! We’ll review it soon.'
       );
+
+      // ✅ Fully reset form
       setForm(initial);
+      setFormKey((k) => k + 1);
     } catch (err: any) {
       setStatus('err');
       setMsg(err.message || 'Error');
@@ -93,7 +106,12 @@ export default function TicketForm({
   }
 
   return (
-    <form onSubmit={onSubmit} className="space-y-5">
+    <form key={formKey} onSubmit={onSubmit} className="space-y-5">
+      {/* Section Header */}
+      <h2 className="text-lg font-semibold opacity-80 border-b border-white/10 pb-1 mb-3">
+        {L.isAr ? 'تفاصيل التذكرة' : 'Ticket Details'}
+      </h2>
+
       {/* Discord Account */}
       <div>
         <label className="text-sm opacity-80">
@@ -114,12 +132,16 @@ export default function TicketForm({
       </div>
 
       {/* Dynamic Fields */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <div
+        className={`grid gap-4 ${
+          fields.length > 6 ? 'sm:grid-cols-1' : 'sm:grid-cols-2'
+        }`}
+      >
         {fields.map((f) => {
           const label = L.isAr ? f.labelAr : f.labelEn;
           const placeholder = L.isAr ? f.placeholderAr : f.placeholderEn;
 
-          // Input (text, number, email)
+          // 🧾 Text / Number / Email
           if (['text', 'number', 'email'].includes(f.type)) {
             return (
               <div key={f.name}>
@@ -137,7 +159,7 @@ export default function TicketForm({
             );
           }
 
-          // Textarea
+          // 📝 Textarea (always full-width)
           if (f.type === 'textarea') {
             return (
               <div key={f.name} className="sm:col-span-2">
@@ -155,7 +177,7 @@ export default function TicketForm({
             );
           }
 
-          // Select
+          // ⬇️ Select
           if (f.type === 'select') {
             return (
               <div key={f.name} className="sm:col-span-2">
@@ -167,7 +189,9 @@ export default function TicketForm({
                   required={!!f.required}
                   className="mt-1 w-full rounded-xl border border-white/15 bg-[#2a0c4a]/40 text-white/90 px-3 py-2 outline-none transition focus:border-[#c27cff] focus:ring-1 focus:ring-[#c27cff] appearance-none"
                 >
-                  <option value="">{L.isAr ? 'اختر' : 'Select'}</option>
+                  <option disabled value="">
+                    {L.isAr ? 'اختر خياراً' : 'Select an option'}
+                  </option>
                   {f.options?.map((o: any) => {
                     const value = typeof o === 'string' ? o : o.value;
                     const labelText =
@@ -187,7 +211,7 @@ export default function TicketForm({
             );
           }
 
-          // Checkbox
+          // ☑️ Checkbox
           if (f.type === 'checkbox') {
             return (
               <div
@@ -217,7 +241,7 @@ export default function TicketForm({
         })}
       </div>
 
-      {/* Submit */}
+      {/* 📤 Submit */}
       <div className="flex items-center justify-between gap-3">
         <div className="text-xs opacity-70">
           {L.isAr
@@ -239,7 +263,7 @@ export default function TicketForm({
         </button>
       </div>
 
-      {/* Status */}
+      {/* 🧾 Status Messages */}
       {status !== 'idle' && (
         <div
           className={`rounded-xl border px-3 py-2 text-sm ${
