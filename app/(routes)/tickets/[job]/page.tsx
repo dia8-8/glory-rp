@@ -5,8 +5,8 @@ import { getLang, t } from '@/lib/i18n-server';
 import { TICKETS, type TicketKey } from '@/lib/tickets';
 import TicketsForm from '@/components/TicketsForm';
 
-export default async function TicketPage({ params }: { params: { category: string } }) {
-  const categoryKey = params.category as TicketKey;
+export default async function TicketPage({ params }: { params: { job: string } }) {
+  const categoryKey = params.job as TicketKey;
   const ticket = TICKETS[categoryKey];
   if (!ticket) return notFound();
 

@@ -1,12 +1,12 @@
 import Link from 'next/link';
-import { notFound, redirect } from 'next/navigation';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
 import { getLang } from '@/lib/i18n-server';
 import { t } from '@/lib/i18n';
 import { CITYHALL } from '@/lib/cityhall';
 import Reveal from '@/components/Reveal';
 import { Building2, FileText } from 'lucide-react';
+import { getServerSession } from 'next-auth';
+import { redirect } from 'next/navigation';
+import { authOptions } from '@/lib/auth';
 
 const ICONS: Record<string, any> = {
   business: Building2,
@@ -14,7 +14,7 @@ const ICONS: Record<string, any> = {
 };
 
 export default async function CityhallIndexPage() {
-  // 🔒 Require login
+    // 🔒 Require login before showing the page
   const session = await getServerSession(authOptions);
   if (!session) redirect('/signin?callbackUrl=/cityhall');
 
@@ -30,9 +30,7 @@ export default async function CityhallIndexPage() {
             {isAr ? 'البلدية' : 'City Hall'}
           </h2>
           <p className="mt-3 text-base text-white/80">
-            {isAr
-              ? 'قدّم شكوى أو طلب عمل تجاري بسهولة.'
-              : 'Submit a complaint or apply for a business with ease.'}
+            {isAr ? 'قدّم شكوى أو طلب عمل تجاري بسهولة.' : 'Submit a complaint or apply for a business with ease.'}
           </p>
         </div>
 
@@ -48,10 +46,7 @@ export default async function CityhallIndexPage() {
                   <div className="absolute -top-7 left-1/2 -translate-x-1/2">
                     <div
                       className="flex h-14 w-14 items-center justify-center rounded-2xl ring-2 ring-white/20 shadow-xl"
-                      style={{
-                        background:
-                          'linear-gradient(135deg, var(--brand-from), var(--brand-to))',
-                      }}
+                      style={{ background: 'linear-gradient(135deg, var(--brand-from), var(--brand-to))' }}
                       aria-hidden
                     >
                       <Icon className="h-7 w-7 text-white/80" />

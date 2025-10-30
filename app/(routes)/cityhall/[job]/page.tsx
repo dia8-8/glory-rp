@@ -1,23 +1,26 @@
 import { notFound, redirect } from 'next/navigation';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import { getLang, t } from '@/lib/i18n-server';
+import { getLang } from '@/lib/i18n-server';
 import { CITYHALL, type CityhallKey } from '@/lib/cityhall';
 import CityHallForm from '@/components/CityHallForm';
 
-export default async function CityhallPage({ params }: { params: { category: string } }) {
-  const categoryKey = params.category as CityhallKey;
+export default async function CityhallPage({
+  params,
+}: {
+  params: { job: string };
+}) {
+  const categoryKey = params.job as CityhallKey;
   const category = CITYHALL[categoryKey];
+
   if (!category) return notFound();
 
-  // 🔒 Require sign-in
   const session = await getServerSession(authOptions);
   if (!session) redirect(`/signin?callbackUrl=/cityhall/${categoryKey}`);
 
   const discordName = session.user?.name || '';
   const lang = getLang();
-  const L = t(lang);
-  const isAr = L.isAr;
+  const isAr = lang === 'ar';
 
   return (
     <div className="relative w-full min-h-[100svh] bg-[#170930]">
