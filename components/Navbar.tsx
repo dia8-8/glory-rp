@@ -31,7 +31,7 @@ export default function Navbar() {
           <Link className="btn btn-ghost" href="/jobs">{L.nav.jobs}</Link>
           <Link className="btn btn-ghost" href="/cityhall">{L.nav.cityhall}</Link>
           <Link className="btn btn-ghost" href="/tickets">{L.nav.tickets}</Link>
-          <Link className="btn btn-ghost" href="/store">{L.nav.store}</Link>
+          <Link className="btn btn-ghost" href="/vipshop">{L.nav.store}</Link>
           <JoinUsCta label={L.hero.ctaJoin} />
         </nav>
         <div className="flex items-center gap-2">
