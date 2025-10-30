@@ -58,7 +58,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* STREAMERS SECTION (10 visible, with controls) */}
+      {/* STREAMERS SECTION (smooth slider) */}
       <hr className="h-px border-0 bg-[#a865fa]" />
       <section className="relative w-full bg-[#170930] pt-12 pb-20 overflow-hidden">
         <Particles
@@ -79,31 +79,43 @@ export default function HomePage() {
             <p className="mt-3 text-base text-white/80">{L.live.subtitle}</p>
           </Reveal>
 
+          {/* SLIDER CONTAINER */}
           <div className="relative mt-10 flex flex-col items-center">
-            {/* STREAMERS GRID */}
-            <div
-              key={page}
-              className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-6 transition-opacity duration-500 ease-in-out"
-            >
-              {current.map((s, i) => (
-                <Reveal key={s.name + i} delay={i * 0.05}>
-                  <a
-                    href={s.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="group flex flex-col items-center text-center transition-transform hover:scale-105"
-                  >
-                    <img
-                      src={s.avatar}
-                      alt={s.name}
-                      className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-full border-2 border-[#b841e4] object-cover shadow-lg group-hover:shadow-[#b841e4]/50 transition"
-                    />
-                    <p className="mt-3 text-sm sm:text-base font-semibold group-hover:text-[#b841e4] transition">
-                      {s.name}
-                    </p>
-                  </a>
-                </Reveal>
-              ))}
+            <div className="overflow-hidden w-full">
+              <div
+                className="flex transition-transform duration-700 ease-in-out"
+                style={{ transform: `translateX(-${page * 100}%)` }}
+              >
+                {Array.from({ length: totalPages }).map((_, pageIndex) => {
+                  const start = pageIndex * perPage;
+                  const pageItems = STREAMERS.slice(start, start + perPage);
+                  return (
+                    <div
+                      key={pageIndex}
+                      className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-6 min-w-full shrink-0"
+                    >
+                      {pageItems.map((s, i) => (
+                        <a
+                          key={s.name + i}
+                          href={s.link}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="group flex flex-col items-center text-center transition-transform hover:scale-105"
+                        >
+                          <img
+                            src={s.avatar}
+                            alt={s.name}
+                            className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-full border-2 border-[#b841e4] object-cover shadow-lg group-hover:shadow-[#b841e4]/50 transition"
+                          />
+                          <p className="mt-3 text-sm sm:text-base font-semibold group-hover:text-[#b841e4] transition">
+                            {s.name}
+                          </p>
+                        </a>
+                      ))}
+                    </div>
+                  );
+                })}
+              </div>
             </div>
 
             {/* CONTROLS */}
@@ -131,6 +143,7 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
 
       {/* SOCIAL STATS */}
       <hr className="h-px border-0 bg-[#a865fa]" />
