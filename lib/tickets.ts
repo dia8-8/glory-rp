@@ -3,6 +3,7 @@ export type TicketKey = 'server' | 'glitch' | 'vip' | 'player';
 export const TICKETS: Record<TicketKey, any> = {
   // 🎫 Server Ticket
   server: {
+    slug: 'server',
     titleEn: 'Server Support Ticket',
     titleAr: 'تذكرة دعم السيرفر',
     descEn: 'Submit a support request related to the server.',
@@ -22,6 +23,7 @@ export const TICKETS: Record<TicketKey, any> = {
 
   // 🐛 Glitch / Bug Report
   glitch: {
+    slug: 'glitch',
     titleEn: 'Glitch / Bug Report',
     titleAr: 'الإبلاغ عن خلل أو خطأ',
     descEn: 'Report a glitch or bug you encountered in the city.',
@@ -34,7 +36,6 @@ export const TICKETS: Record<TicketKey, any> = {
         labelEn: 'Location of the glitch (if any)',
         labelAr: 'مكان الخلل (إن وجد)',
         type: 'text',
-        required: false,
       },
       {
         name: 'description',
@@ -57,6 +58,7 @@ export const TICKETS: Record<TicketKey, any> = {
 
   // ⭐ VIP Support Ticket
   vip: {
+    slug: 'vip',
     titleEn: 'VIP Ticket',
     titleAr: 'تذكرة VIP',
     descEn: 'Request or manage VIP packages within the city.',
@@ -100,6 +102,7 @@ export const TICKETS: Record<TicketKey, any> = {
 
   // 🚔 Player Report
   player: {
+    slug: 'player',
     titleEn: 'Player Report',
     titleAr: 'بلاغ عن لاعب',
     descEn:
@@ -137,7 +140,6 @@ export const TICKETS: Record<TicketKey, any> = {
         labelEn: 'Accused Player Discord Name (if known)',
         labelAr: 'اسم اللاعب المشتكى عليه في الديسكورد (إن وجد)',
         type: 'text',
-        required: false,
       },
       {
         name: 'details',
@@ -149,7 +151,7 @@ export const TICKETS: Record<TicketKey, any> = {
       {
         name: 'videoLink',
         labelEn:
-          'Video Evidence Link (Must include all players’ voices & at least 120 seconds before the incident)',
+          'Video Evidence Link (must include all players’ voices & at least 120 seconds before the incident)',
         labelAr:
           'لينك فيديو (يجب أن يكون صوت جميع اللاعبين واضحاً ومدة الفيديو لا تقل عن 120 ثانية قبل الحادث)',
         placeholderEn: 'Paste YouTube / Streamable / Google Drive link',
