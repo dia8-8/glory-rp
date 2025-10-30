@@ -17,7 +17,7 @@ export async function POST(req: Request) {
 
   const body = (await req.json().catch(() => ({}))) as Record<string, unknown>;
 
-  const required = ['age', 'timezone', 'hours', 'experience', 'about', 'mic', 'rulesOk'];
+  const required = ['age', 'experience', 'about', 'mic', 'rulesOk'];
   const missing = required.filter(k => body[k] === undefined || body[k] === '' || body[k] === null);
   if (missing.length) return NextResponse.json({ error: `Missing: ${missing.join(', ')}` }, { status: 400 });
   if (String(body.rulesOk) !== 'true' && body.rulesOk !== true) {
