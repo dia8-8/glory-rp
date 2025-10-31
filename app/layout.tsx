@@ -9,6 +9,7 @@ import BackToTop from '@/components/BackToTop';
 import SessionWrapper from '@/components/SessionWrapper';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
+import { Analytics } from "@vercel/analytics/next"
 
 export const metadata: Metadata = {
   title: 'Glory RP | جلوري',
