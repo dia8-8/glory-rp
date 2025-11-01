@@ -10,9 +10,9 @@ export const STREAMERS = [
   { name: 'Ben 3adel', avatar: 'https://files.kick.com/images/user/13549654/profile_image/conversion/b375ebe3-2b6e-4ea8-baa9-4e1318c37a5b-fullsize.webp', link: 'https://kick.com/ben3adel' },
   { name: 'Mo3oss', avatar: 'https://files.kick.com/images/user/34839439/profile_image/conversion/a050c1cc-18c6-4812-bbb8-7462a9070714-fullsize.webp', link: 'https://kick.com/mo3oss' },
   { name: '3awaddyy', avatar: 'https://files.kick.com/images/user/62843837/profile_image/conversion/5ef95ee6-5acb-45c6-bd17-64a377542df5-fullsize.webp', link: 'https://kick.com/3awaddyy' },
-  { name: 'Alfredo', avatar: 'https://i.imgur.com/MSL9kHC.jpeg', link: 'https://www.tiktok.com/@alfredo_ex?lang=en' },
+  { name: 'Alfredo', avatar: 'https://i.imgur.com/7dF0lQe.jpeg', link: 'https://www.tiktok.com/@alfredo_ex?lang=en' },
   { name: 'ReBoo', avatar: 'https://static-cdn.jtvnw.net/jtv_user_pictures/4be7b628-5848-4292-90a3-3a9965446488-profile_image-70x70.png', link: 'https://www.twitch.tv/reboo0' },
   { name: 'Mafiia_1', avatar: 'https://files.kick.com/images/user/29261048/profile_image/conversion/ad79658e-b8ff-4c21-b106-67fe908ed14a-fullsize.webp', link: 'https://kick.com/mafiia-1' },
-  { name: 'Oocariveraoo', avatar: 'https://p16-sign-sg.tiktokcdn.com/tos-alisg-avt-0068/92f27544753106b5bdca760e03cf0ab9~tplv-tiktokx-cropcenter:1080:1080.jpeg?dr=14579&refresh_token=efde6c15&x-expires=1762048800&x-signature=pFyZ66v3%2FEJext1hjQgNb5Ubq0c%3D&t=4d5b0474&ps=13740610&shp=a5d48078&shcp=81f88b70&idc=my', link: 'https://www.tiktok.com/@oocariveraoo' },
-  { name: 'Sringa Gaming', avatar: 'https://cdn4.telesco.pe/file/jZiZKDOAuhf7sappv-xq2Bm7XfyUx-NRMMt9iSREwnfJPcIyTn1m_dlY1cHfM5nC84_9oIJvHaGiP12h_JPr8tmEjHA185rcXxHeSrAbUx1zdTAJfNdFRAeyiSFdJlCuGfFz0SvfpTNLZjNb_eX2ndQjg0GBnRhBrGIQc3y-aqC2N_j-ItPMa8aUGdKZSZKx6-qyY-Dzhkd_1hywEQqFw-PEMQs-jsgMCD05V-Yg9ag9fkuJBkbN3yG1lYnR2aerwEqcWWroW9ThfmMKF_9MlccNSBIsp8rAmCk4FhR1LKiURCPdhlG8QKcYgsctrR2PoSAxWQzhohf15MddC_24Ag.jpg', link: 'https://www.tiktok.com/@sringa_gaming' },
+  { name: 'Oocariveraoo', avatar: 'https://i.imgur.com/BBqMi7U.png', link: 'https://www.tiktok.com/@oocariveraoo' },
+  { name: 'Sringa Gaming', avatar: 'https://i.imgur.com/MSL9kHC.jpeg'', link: 'https://www.tiktok.com/@sringa_gaming' },
 ];
