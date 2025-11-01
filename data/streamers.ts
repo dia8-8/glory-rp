@@ -14,5 +14,5 @@ export const STREAMERS = [
   { name: 'ReBoo', avatar: 'https://static-cdn.jtvnw.net/jtv_user_pictures/4be7b628-5848-4292-90a3-3a9965446488-profile_image-70x70.png', link: 'https://www.twitch.tv/reboo0' },
   { name: 'Mafiia_1', avatar: 'https://files.kick.com/images/user/29261048/profile_image/conversion/ad79658e-b8ff-4c21-b106-67fe908ed14a-fullsize.webp', link: 'https://kick.com/mafiia-1' },
   { name: 'Oocariveraoo', avatar: 'https://i.imgur.com/BBqMi7U.png', link: 'https://www.tiktok.com/@oocariveraoo' },
-  { name: 'Sringa Gaming', avatar: 'https://i.imgur.com/MSL9kHC.jpeg'', link: 'https://www.tiktok.com/@sringa_gaming' },
+  { name: 'Sringa Gaming', avatar: 'https://i.imgur.com/MSL9kHC.jpeg', link: 'https://www.tiktok.com/@sringa_gaming' },
 ];
