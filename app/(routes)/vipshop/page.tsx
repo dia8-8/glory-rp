@@ -41,13 +41,13 @@ export default function VipShopPage() {
               />
               <h2 className="text-lg font-semibold">{item.name}</h2>
               {item.price1 && (
-                <p className="text-[#bbb] text-sm mt-1">
+                <p className="text-[#bbb] text-sm mt-1" dir="ltr">
                   {item.price1}
                 </p>
               )}
               
               {item.price2 && (
-                <p className="text-[#bbb] text-sm">
+                <p className="text-[#bbb] text-sm" dir="ltr">
                   {item.price2.startsWith("+") ? (
                     <>
                       <span className="text-white font-semibold">+</span>{" "}
