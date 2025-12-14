@@ -161,7 +161,7 @@ export default function HomePage() {
 
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
           <Reveal>
-            <Stat label={L.social.members} value={"1000"} />
+            <Stat label={L.social.members} value={"1500"} />
           </Reveal>
           <Reveal delay={0.06}>
             <Stat label={L.social.followers} value={"250"} />
