@@ -40,8 +40,24 @@ export default function VipShopPage() {
                 className="w-full h-[150px] object-cover rounded-md mb-3"
               />
               <h2 className="text-lg font-semibold">{item.name}</h2>
-              {item.price1 && <p className="text-[#bbb] text-sm mt-1">{item.price1}</p>}
-              {item.price2 && <p className="text-[#bbb] text-sm">{item.price2}</p>}
+              {item.price1 && (
+                <p className="text-[#bbb] text-sm mt-1">
+                  {item.price1}
+                </p>
+              )}
+              
+              {item.price2 && (
+                <p className="text-[#bbb] text-sm">
+                  {item.price2.startsWith("+") ? (
+                    <>
+                      <span className="text-white font-semibold">+</span>{" "}
+                      {item.price2.replace("+", "").trim()}
+                    </>
+                  ) : (
+                    item.price2
+                  )}
+                </p>
+              )}
             </div>
           ))}
         </div>
@@ -66,18 +82,49 @@ export default function VipShopPage() {
 }
 
 const VIP_ITEMS = [
-  { name: "Car Dealer", image: "/images/cardealer1.jpg", price1: "$150 Per Season", price2: "Or $25 Monthly", soldOut: false },
-  { name: "Moto Dealer", image: "/images/motodealer.jpg", price1: "$150 Per Season", price2: "Or $25 Monthly", soldOut: false },
-  { name: "Boats Dealer", image: "/images/cardealer2.jpg", price1: "$150 Per Season", price2: "Or $25 Monthly", soldOut: false  },
-  { name: "Villa", image: "/images/villa.jpg", price1: "$75 Per Season", price2: "Or $20 Monthly", soldOut: false  },
-  { name: "Bike", image: "/images/bike.jpg", price1: "$40 Per Season", price2: "Or $15 Monthly", soldOut: false  },
-  { name: "Car", image: "/images/car.jpg", price1: "$40 Per Season", price2: "Or $15 Monthly", soldOut: false  },
-  { name: "Gang (2 Cars + Villa)", image: "/images/gang.jpg", price1: "$100 First Payment +", price2: " $20 Monthly", soldOut: false  },
-  { name: "Supermarket", image: "/images/supermarket.jpg", price1: "$10 Monthly", soldOut: false  },
-  { name: "Gas Station", image: "/images/gasstation.jpg", price1: "$15 Monthly", soldOut: false  },
-  { name: "Mechanic", image: "/images/mechanic.jpg", price1: "$100 First Payment +", price2: " $ 15 Monthly", soldOut: false },
-  { name: "Restaurant", image: "/images/restaurant.jpg", price1: "$50 First Payment +", price2: " $10 Monthly",soldOut: false  },
-  { name: "Casino", image: "/images/casino.jpg", price1: "$300 First Payment +", price2: " $20 Monthly", soldOut: false  },
-  { name: "Second Character", image: "/images/secondchar.jpg", price1: "$5 Per Season", soldOut: false  },
-  { name: "Personal Garage", image: "/images/garage.jpeg", price1: "$10 Per Month", soldOut: false  },
+  { name: "Car Dealer", image: "/images/cardealer1.jpg", price1: "$150 Per Season", price2: "or $25 Monthly", soldOut: false },
+  { name: "Moto Dealer", image: "/images/motodealer.jpg", price1: "$150 Per Season", price2: "or $25 Monthly", soldOut: false },
+  { name: "Boats Dealer", image: "/images/cardealer2.jpg", price1: "$150 Per Season", price2: "or $25 Monthly", soldOut: false },
+  { name: "Villa", image: "/images/villa.jpg", price1: "$75 Per Season", price2: "or $20 Monthly", soldOut: false },
+  { name: "Bike", image: "/images/bike.jpg", price1: "$40 Per Season", price2: "or $15 Monthly", soldOut: false },
+  { name: "Car", image: "/images/car.jpg", price1: "$40 Per Season", price2: "or $15 Monthly", soldOut: false },
+
+  {
+    name: "Gang (2 Cars + Villa)",
+    image: "/images/gang.jpg",
+    price1: "First payment $100",
+    price2: "+ $20 Monthly",
+    soldOut: false
+  },
+
+  { name: "Supermarket", image: "/images/supermarket.jpg", price1: "$10 Monthly", soldOut: false },
+  { name: "Gas Station", image: "/images/gasstation.jpg", price1: "$15 Monthly", soldOut: false },
+
+  {
+    name: "Mechanic",
+    image: "/images/mechanic.jpg",
+    price1: "First payment $100",
+    price2: "+ $15 Monthly",
+    soldOut: false
+  },
+
+  {
+    name: "Restaurant",
+    image: "/images/restaurant.jpg",
+    price1: "First payment $50",
+    price2: "+ $10 Monthly",
+    soldOut: false
+  },
+
+  {
+    name: "Casino",
+    image: "/images/casino.jpg",
+    price1: "First payment $300",
+    price2: "+ $20 Monthly",
+    soldOut: false
+  },
+
+  { name: "Second Character", image: "/images/secondchar.jpg", price1: "$5 Per Season", soldOut: false },
+  { name: "Personal Garage", image: "/images/garage.jpeg", price1: "$10 Per Month", soldOut: false },
 ];
+
