@@ -79,4 +79,5 @@ const VIP_ITEMS = [
   { name: "Restaurant", image: "/images/restaurant.jpg", price1: "$50 First Payment", price2: "+ $10 Monthly",soldOut: false  },
   { name: "Casino", image: "/images/casino.jpg", price1: "$300 First Payment", price2: "+ $20 Monthly", soldOut: false  },
   { name: "Second Character", image: "/images/secondchar.jpg", price1: "$5 Per Season", soldOut: false  },
+  { name: "Personal Garage", image: "/images/garage.jpeg", price1: "$10 Per Month", soldOut: false  },
 ];
