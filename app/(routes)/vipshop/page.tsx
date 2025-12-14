@@ -93,7 +93,7 @@ const VIP_ITEMS = [
     name: "Gang (2 Cars + Villa)",
     image: "/images/gang.jpg",
     price1: "First payment $100",
-    price2: "+ $20 Monthly",
+    price2: "& $20 Monthly",
     soldOut: false
   },
 
@@ -104,7 +104,7 @@ const VIP_ITEMS = [
     name: "Mechanic",
     image: "/images/mechanic.jpg",
     price1: "First payment $100",
-    price2: "+ $15 Monthly",
+    price2: "& $15 Monthly",
     soldOut: false
   },
 
@@ -112,7 +112,7 @@ const VIP_ITEMS = [
     name: "Restaurant",
     image: "/images/restaurant.jpg",
     price1: "First payment $50",
-    price2: "+ $10 Monthly",
+    price2: "& $10 Monthly",
     soldOut: false
   },
 
@@ -120,7 +120,7 @@ const VIP_ITEMS = [
     name: "Casino",
     image: "/images/casino.jpg",
     price1: "First payment $300",
-    price2: "+ $20 Monthly",
+    price2: "& $20 Monthly",
     soldOut: false
   },
 
