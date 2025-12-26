@@ -66,6 +66,10 @@ export default function VipShopPage() {
         <p className="text-center text-sm text-[#aaa] my-6 px-4">
           To purchase VIP, please fill the form in the link below.
         </p>
+        <p className="text-center text-sm text-[#aaa] my-6 px-4">
+          No changes or refunds are accepted after purchase.
+        </p>
+        
 
         {/* Discord Button */}
         <div className="flex justify-center">
