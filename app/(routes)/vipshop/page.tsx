@@ -86,9 +86,9 @@ export default function VipShopPage() {
 }
 
 const VIP_ITEMS = [
-  { name: "Car Dealer", image: "/images/cardealer1.jpg", price1: "$150 Per Season", price2: "or $25 Monthly", soldOut: false },
-  { name: "Moto Dealer", image: "/images/motodealer.jpg", price1: "$150 Per Season", price2: "or $25 Monthly", soldOut: false },
-  { name: "Boats Dealer", image: "/images/cardealer2.jpg", price1: "$150 Per Season", price2: "or $25 Monthly", soldOut: false },
+  { name: "Car Dealer", image: "/images/cardealer1.jpg", price1: "$150 Per Season", price2: "or $30 Monthly", soldOut: false },
+  { name: "Moto Dealer", image: "/images/motodealer.jpg", price1: "$150 Per Season", price2: "or $30 Monthly", soldOut: false },
+  { name: "Boats Dealer", image: "/images/cardealer2.jpg", price1: "$150 Per Season", price2: "or $30 Monthly", soldOut: false },
   { name: "Villa", image: "/images/villa.jpg", price1: "$75 Per Season", price2: "or $20 Monthly", soldOut: false },
   { name: "Bike", image: "/images/bike.jpg", price1: "$40 Per Season", price2: "or $10 Monthly", soldOut: false },
   { name: "Car", image: "/images/car.jpg", price1: "$40 Per Season", price2: "or $10 Monthly", soldOut: false },
@@ -128,7 +128,7 @@ const VIP_ITEMS = [
     soldOut: false
   },
 
-  { name: "Second Character", image: "/images/secondchar.jpg", price1: "$5 Per Season", soldOut: false },
+  { name: "Third Character", image: "/images/secondchar.jpg", price1: "$10 Per Season", soldOut: false },
   { name: "Personal Garage", image: "/images/garage.jpeg", price1: "$10 Per Month", soldOut: false },
 ];
 
