@@ -90,8 +90,8 @@ const VIP_ITEMS = [
   { name: "Moto Dealer", image: "/images/motodealer.jpg", price1: "$150 Per Season", price2: "or $30 Monthly", soldOut: false },
   { name: "Boats Dealer", image: "/images/cardealer2.jpg", price1: "$150 Per Season", price2: "or $30 Monthly", soldOut: false },
   { name: "Villa", image: "/images/villa.jpg", price1: "$75 Per Season", price2: "or $20 Monthly", soldOut: false },
-  { name: "Bike", image: "/images/bike.jpg", price1: "$40 Per Season", price2: "or $15 Monthly", soldOut: false },
-  { name: "Car", image: "/images/car.jpg", price1: "$40 Per Season", price2: "or $15 Monthly", soldOut: false },
+  { name: "Bike", image: "/images/bike.jpg", price1: "$40-50 Per Season", price2: "or $15-25 Monthly", soldOut: false },
+  { name: "Car", image: "/images/car.jpg", price1: "$40-50 Per Season", price2: "or $15-25 Monthly", soldOut: false },
 
   {
     name: "Gang (2 Cars + Villa)",
