@@ -90,8 +90,8 @@ const VIP_ITEMS = [
   { name: "Moto Dealer", image: "/images/motodealer.jpg", price1: "$150 Per Season", price2: "or $30 Monthly", soldOut: false },
   { name: "Boats Dealer", image: "/images/cardealer2.jpg", price1: "$150 Per Season", price2: "or $30 Monthly", soldOut: false },
   { name: "Villa", image: "/images/villa.jpg", price1: "$75 Per Season", price2: "or $20 Monthly", soldOut: false },
-  { name: "Bike", image: "/images/bike.jpg", price1: "$40 Per Season", price2: "or $10 Monthly", soldOut: false },
-  { name: "Car", image: "/images/car.jpg", price1: "$40 Per Season", price2: "or $10 Monthly", soldOut: false },
+  { name: "Bike", image: "/images/bike.jpg", price1: "$40 Per Season", price2: "or $15 Monthly", soldOut: false },
+  { name: "Car", image: "/images/car.jpg", price1: "$40 Per Season", price2: "or $15 Monthly", soldOut: false },
 
   {
     name: "Gang (2 Cars + Villa)",
@@ -101,8 +101,8 @@ const VIP_ITEMS = [
     soldOut: false
   },
 
-  { name: "Supermarket", image: "/images/supermarket.jpg", price1: "$10 Monthly", soldOut: false },
-  { name: "Gas Station", image: "/images/gasstation.jpg", price1: "$15 Monthly", soldOut: false },
+  { name: "Supermarket", image: "/images/supermarket.jpg", price1: "$15-30 Monthly (Depends on location)", soldOut: false },
+  { name: "Gas Station", image: "/images/gasstation.jpg", price1: "$20-50 Monthly (Depends on location)", soldOut: false },
 
   {
     name: "Mechanic",
@@ -123,8 +123,8 @@ const VIP_ITEMS = [
   {
     name: "Casino",
     image: "/images/casino.jpg",
-    price1: "First payment $300",
-    price2: "& $20 Monthly",
+    price1: "First payment $200",
+    price2: "& $40 Monthly",
     soldOut: false
   },
 
