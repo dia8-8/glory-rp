@@ -130,5 +130,7 @@ const VIP_ITEMS = [
 
   { name: "Third Character", image: "/images/secondchar.jpg", price1: "$10 Per Season", soldOut: false },
   { name: "Personal Garage", image: "/images/garage.jpeg", price1: "$10 Per Month", soldOut: false },
+  { name: "Personal Plate", image: "/images/garage.jpeg", price1: "$10 Per Month", soldOut: false },
+  { name: "Personal Sim Number", image: "/images/garage.jpeg", price1: "$10 Per Month", soldOut: false },
 ];
 
