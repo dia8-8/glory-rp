@@ -1,4 +1,5 @@
 export const STREAMERS = [
+  { name: 'Samir Farhat', avatar: 'https://files.kick.com/images/user/36977875/profile_image/conversion/1d8380ad-9f4f-40b1-a18c-2747c9cf37d4-fullsize.webp', link: 'https://kick.com/samirfarhat' },
   { name: 'Derrad', avatar: 'https://i.imgur.com/HEG7NQ8.png', link: 'https://www.twitch.tv/derrad_ggz' },
   { name: 'Eid Gaming', avatar: 'https://i.imgur.com/PFOGt8v.jpeg', link: 'https://www.tiktok.com/@eidgaming003id?lang=en' },
   { name: 'Nefelibata', avatar: 'https://i.imgur.com/DvuUmvk.jpeg', link: 'https://www.tiktok.com/@rison098?lang=en' },
