@@ -785,11 +785,11 @@ export default function RulesPage() {
   }).filter(c => c.items.length > 0); // 🔥 hides empty categories
 
   return (
-    <div className="relative min-h-[100dvh] w-full">
+    <div className="relative min-h-screen w-full">
       <div className="pointer-events-none fixed inset-0 -z-10 bg-[url('/bg.png')] bg-cover bg-center bg-no-repeat" />
       <div className="pointer-events-none fixed inset-0 -z-10 bg-black/50" />
 
-      <main className="mx-auto max-w-5xl px-4 pb-14 pt-24 sm:pt-28 md:pt-32">
+      <main className="relative z-10 mx-auto max-w-5xl px-4 pb-14 pt-24 sm:pt-28 md:pt-32">
         <Reveal>
           <div className="mx-auto mb-8 max-w-3xl text-center">
             <h2 className="text-3xl font-extrabold sm:text-4xl md:text-5xl">
@@ -797,7 +797,7 @@ export default function RulesPage() {
             </h2>
             <p className="mt-3 text-base text-white/80">{L.rules.body}</p>
           </div>
-
+        </Reveal>
           <div className="space-y-6">
             {categorized.map((category, i) => (
               <div key={i}>
@@ -811,7 +811,7 @@ export default function RulesPage() {
                   {category.items.map((r, j) => (
                     <details
                         key={j}
-                        className="group rounded-2xl border border-[#a865fa] bg-white/10 p-4 open:bg-[#170930]"
+                        className="group relative block w-full overflow-visible rounded-2xl border border-[#a865fa] bg-white/10 p-4 open:bg-[#170930]"
                     >
                         {/* 🔥 HEADER (YOU MISSED THIS) */}
                         <summary className="flex cursor-pointer list-none items-center justify-between gap-3">
@@ -832,8 +832,8 @@ export default function RulesPage() {
                                 const safeBelowText = (L.isAr ? r.textArBelow : r.textEnBelow) ?? '';
 
                                 return (
-                                    <div className="mt-4 overflow-x-auto">
-                                        <table className="w-full text-sm text-white/90 border border-red-500/30 rounded-xl overflow-hidden">
+                                    <div className="mt-4 w-full overflow-x-auto overflow-y-visible">
+                                        <table className="w-full text-sm text-white/90 border border-red-500/30 rounded-xl overflow-auto">
                                             <thead className="bg-red-600 text-white">
                                                 <tr>
                                                     {r.columns.map((col, idx) => (
@@ -906,7 +906,6 @@ export default function RulesPage() {
               </div>
             ))}
           </div>
-        </Reveal>
       </main>
     </div>
   );
