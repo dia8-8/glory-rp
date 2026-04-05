@@ -84,7 +84,7 @@ export default function HomePage() {
             <div className="overflow-hidden w-full">
               <div
                 className="flex transition-transform duration-700 ease-in-out"
-                style={{ transform: `translateX(-${page * 100}%)` }}
+                style={{transform: `translateX(${L.isAr ? page * 100 : -page * 100}%)`,}}
               >
                 {Array.from({ length: totalPages }).map((_, pageIndex) => {
                   const start = pageIndex * perPage;
@@ -121,11 +121,11 @@ export default function HomePage() {
             {/* CONTROLS */}
             <div className="flex items-center justify-center gap-4 mt-8">
               <button
-                onClick={prevPage}
+                onClick={L.isAr ? nextPage : prevPage}
                 className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition"
                 aria-label="Previous"
               >
-                <ChevronLeft className="w-6 h-6" />
+                {L.isAr ? <ChevronRight className="w-6 h-6" /> : <ChevronLeft className="w-6 h-6" />}
               </button>
 
               <span className="text-sm opacity-80">
@@ -133,11 +133,11 @@ export default function HomePage() {
               </span>
 
               <button
-                onClick={nextPage}
+                onClick={L.isAr ? prevPage : nextPage}
                 className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition"
                 aria-label="Next"
               >
-                <ChevronRight className="w-6 h-6" />
+                {L.isAr ? <ChevronLeft className="w-6 h-6" /> : <ChevronRight className="w-6 h-6" />}
               </button>
             </div>
           </div>
