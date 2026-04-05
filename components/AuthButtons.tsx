@@ -35,7 +35,7 @@ export default function AuthButtons() {
   return (
     <button
       className="btn btn-primary"
-      onClick={async () => { setLoading('in'); await signIn('discord', { callbackUrl: '/jobs' }); }}
+      onClick={async () => { setLoading('in'); await signIn('discord', { callbackUrl: '/' }); }}
       disabled={loading==='in'}
     >
       {loading==='in'
