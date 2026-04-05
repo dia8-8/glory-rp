@@ -1,4 +1,4 @@
-export type JobKey = 'police' | 'ems' | 'justice';
+export type JobKey = 'police' | 'ems';
 
 export type Field =
   | { type: 'text' | 'number'; name: string; required?: boolean;
@@ -72,31 +72,31 @@ export const JOBS: Record<JobKey, {
   //     { type: 'textarea', name: 'about', required: true, labelEn: 'Why this role?', labelAr: 'لماذا هذا الدور؟' },
   //   ],
   // },
-  justice: {
-    slug: 'justice',
-    webhookEnv: 'DISCORD_WEBHOOK_JUSTICE',
-    titleEn: 'Justice',
-    titleAr: 'العدالة',
-    descEn: 'Lawyers, prosecutors, and judges ensuring fair play.',
-    descAr: 'محامون، وكلاء نيابة، وقضاة لضمان العدالة.',
-    embedImage: '/bg.png', 
-    mentionRoleId: '1427851241459023892',
-    fields: [
+  // justice: {
+  //   slug: 'justice',
+  //   webhookEnv: 'DISCORD_WEBHOOK_JUSTICE',
+  //   titleEn: 'Justice',
+  //   titleAr: 'العدالة',
+  //   descEn: 'Lawyers, prosecutors, and judges ensuring fair play.',
+  //   descAr: 'محامون، وكلاء نيابة، وقضاة لضمان العدالة.',
+  //   embedImage: '/bg.png', 
+  //   mentionRoleId: '1427851241459023892',
+  //   fields: [
       
-      { type: 'text', name: 'discord', required: true, labelEn: 'Discord', labelAr: 'دسكورد' },
-      { type: 'text', name: 'name', required: true, labelEn: 'Full Name', labelAr: 'الاسم الكامل' },
-      { type: 'number', name: 'age', required: true, min: 18, labelEn: 'Age', labelAr: 'العمر' },
-      { type: 'number', name: 'city_hours', min: 0, labelEn: 'Estimated City Hours', labelAr: 'عدد ساعاتك بالمدينة (تقديري)' },
-      {
-        type: 'select', name: 'specialty', required: true,
-        labelEn: 'Specialty', labelAr: 'التخصص',
-        options: [
-          { value: 'lawyer', labelEn: 'Lawyer', labelAr: 'محامي' },
-          { value: 'prosecutor', labelEn: 'Prosecutor', labelAr: 'وكيل نيابة' },
-          { value: 'judge', labelEn: 'Judge', labelAr: 'قاضي' },
-        ],
-      },
-      { type: 'textarea', name: 'about', required: true, labelEn: 'Relevant experience', labelAr: 'الخبرة ذات الصلة' },
-    ],
-  },
+  //     { type: 'text', name: 'discord', required: true, labelEn: 'Discord', labelAr: 'دسكورد' },
+  //     { type: 'text', name: 'name', required: true, labelEn: 'Full Name', labelAr: 'الاسم الكامل' },
+  //     { type: 'number', name: 'age', required: true, min: 18, labelEn: 'Age', labelAr: 'العمر' },
+  //     { type: 'number', name: 'city_hours', min: 0, labelEn: 'Estimated City Hours', labelAr: 'عدد ساعاتك بالمدينة (تقديري)' },
+  //     {
+  //       type: 'select', name: 'specialty', required: true,
+  //       labelEn: 'Specialty', labelAr: 'التخصص',
+  //       options: [
+  //         { value: 'lawyer', labelEn: 'Lawyer', labelAr: 'محامي' },
+  //         { value: 'prosecutor', labelEn: 'Prosecutor', labelAr: 'وكيل نيابة' },
+  //         { value: 'judge', labelEn: 'Judge', labelAr: 'قاضي' },
+  //       ],
+  //     },
+  //     { type: 'textarea', name: 'about', required: true, labelEn: 'Relevant experience', labelAr: 'الخبرة ذات الصلة' },
+  //   ],
+  // },
 };

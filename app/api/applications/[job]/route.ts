@@ -38,7 +38,7 @@ export async function POST(req: Request, { params }: { params: { job: string } }
   const FALLBACK_ROLE_MAP: Partial<Record<JobKey, string>> = {
     police: process.env.DISCORD_ROLEID_POLICE,
     ems: process.env.DISCORD_ROLEID_EMS,
-    justice: process.env.DISCORD_ROLEID_JUSTICE,
+    //justice: process.env.DISCORD_ROLEID_JUSTICE,
     //mechanic: process.env.DISCORD_ROLEID_MECHANIC,
   };
 
