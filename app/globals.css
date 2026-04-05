@@ -1,0 +1,25 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root { --brand-from:#a865fa; --brand-to:#a865fa; --page-bg: #0b0b10;}
+html, body { height:100%;  color:#fff; } /*background:#170930;*/
+html { scroll-behavior: smooth; }
+
+
+/* Utilities */
+.card { @apply rounded-2xl border border-white/10 bg-white/5 backdrop-blur; }
+.btn { @apply rounded-xl px-4 py-2 text-sm font-semibold; }
+.btn-primary {@apply text-white transition duration-200; background-image: linear-gradient(135deg, var(--brand-from), var(--brand-to));}
+.btn-primary {  @apply hover:bg-white/20 active:brightness-95 active:translate-y-px focus-visible:ring-2 focus-visible:ring-white/50;}
+.btn-ghost { @apply border border-[#a865fa] text-white/90 hover:bg-white/20; }
+.pill { @apply inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/5 px-3 py-1 text-xs; }
+
+/* Background effects */
+.bg-grid {
+  background-image:
+    linear-gradient(to right, rgba(255,255,255,0.06) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255,255,255,0.06) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+.blob { filter: blur(40px); opacity:.5; }
