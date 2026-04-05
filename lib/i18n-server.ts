@@ -42,7 +42,7 @@ export function t(lang: Lang) {
       followers: isAr ? 'المتابعين' : 'Followers',
       twitter: isAr ? 'تويتر' : 'Twitter',
       discord: isAr ? 'دسكورد' : 'Discord',
-      tiktok: isAr ? 'كيك' : 'Tiktok',
+      tiktok: isAr ? 'تيك توك' : 'Tiktok',
     },
     login: {
       title: isAr ? 'تسجيل الدخول' : 'Sign in',
