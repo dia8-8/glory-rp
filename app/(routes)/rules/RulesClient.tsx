@@ -842,24 +842,76 @@ const CATEGORIES = [
                 key={i}
                 className="rounded-2xl border border-[#a865fa]/40 bg-[#0f0f1a]/80 p-5 shadow-lg"
               >
-                <h4 className="font-semibold mb-2 text-white">
-                  {r.title}
+                <h4 className="font-semibold mb-3 text-white">
+                {r.title}
                 </h4>
 
-                {typeof r.text === "string" && /\n/.test(r.text) ? (
-                  <ul className="list-disc ps-5 text-white/80 space-y-1">
+                {/* 🔥 TABLE SUPPORT */}
+                {r.type === "table" && r.columns && r.rows ? (
+                <div className="overflow-x-auto">
+                    <table className="w-full text-sm border border-[#a865fa]/30 rounded-xl overflow-hidden">
+                    
+                    {/* HEADER */}
+                    <thead className="bg-[#a865fa]/80 text-white">
+                        <tr>
+                        {r.columns.map((col, idx) => (
+                            <th key={idx} className="px-3 py-2 text-center">
+                            {L.isAr ? col.labelAr : col.labelEn}
+                            </th>
+                        ))}
+                        </tr>
+                    </thead>
+
+                    {/* BODY */}
+                    <tbody>
+                        {r.rows.map((row, i) => (
+                        <tr
+                            key={i}
+                            className={`text-center border-t border-[#a865fa]/20 ${
+                            i % 2 ? "bg-white/5" : ""
+                            }`}
+                        >
+                            {r.columns.map((col, j) => (
+                            <td key={j} className="px-3 py-2">
+                                {col.key === "type"
+                                ? (L.isAr ? row.typeAr : row.typeEn)
+                                : row[col.key as keyof typeof row] ?? "-"}
+                            </td>
+                            ))}
+                        </tr>
+                        ))}
+                    </tbody>
+                    </table>
+
+                    {/* 🔽 BELOW TEXT */}
+                    {((L.isAr ? r.textArBelow : r.textEnBelow) ?? "") && (
+                    <ul className="mt-4 list-disc ps-5 text-white/80 space-y-1">
+                        {(L.isAr ? r.textArBelow : r.textEnBelow)
+                        .split(/\r?\n+/)
+                        .map((s) => s.trim())
+                        .filter(Boolean)
+                        .map((line, k) => (
+                            <li key={k}>
+                            {line.replace(/^([•\-*]|\d+[.)])\s*/, "")}
+                            </li>
+                        ))}
+                    </ul>
+                    )}
+                </div>
+                ) : typeof r.text === "string" && /\n/.test(r.text) ? (
+                <ul className="list-disc ps-5 text-white/80 space-y-1">
                     {r.text
-                      .split(/\r?\n+/)
-                      .map((s) => s.trim())
-                      .filter(Boolean)
-                      .map((line, k) => (
+                    .split(/\r?\n+/)
+                    .map((s) => s.trim())
+                    .filter(Boolean)
+                    .map((line, k) => (
                         <li key={k}>
-                          {line.replace(/^([•\-*]|\d+[.)])\s*/, "")}
+                        {line.replace(/^([•\-*]|\d+[.)])\s*/, "")}
                         </li>
-                      ))}
-                  </ul>
+                    ))}
+                </ul>
                 ) : (
-                  <p className="text-white/80">{r.text}</p>
+                <p className="text-white/80">{r.text}</p>
                 )}
               </div>
             ))}
