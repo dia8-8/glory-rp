@@ -74,11 +74,8 @@ export const authOptions: NextAuthOptions = {
           );
 
           if (res.status !== 200) {
-            // console.log("[AUTH] Not in Discord server:", discordId);
             return "/invite";
           }
-
-          // console.log("[AUTH] Verified Discord member:", discordId);
         } catch (err) {
           console.error("[AUTH ERROR]", err);
           return false;
@@ -86,6 +83,33 @@ export const authOptions: NextAuthOptions = {
       }
 
       return true;
-    }
+    },
+
+    // ✅ NOW CORRECTLY PLACED
+    async jwt({ token, account, profile }) {
+      if (account?.provider === "discord" && profile) {
+        const p = profile as any;
+
+        token.id = p.id;
+        token.name = p.username;
+        token.image = p.avatar
+          ? `https://cdn.discordapp.com/avatars/${p.id}/${p.avatar}.png`
+          : undefined;
+      }
+
+      return token;
+    },
+
+    // ✅ NOW CORRECTLY PLACED
+    async session({ session, token }) {
+      if (session.user) {
+        session.user.id = token.id as string;
+        session.user.name = token.name;
+        session.user.image = token.image;
+      }
+
+      return session;
+    },
   },
+  
 };
