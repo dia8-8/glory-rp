@@ -4,6 +4,7 @@ export const STREAMERS = [
   { name: 'Eid Gaming', avatar: 'https://i.imgur.com/PFOGt8v.jpeg', link: 'https://www.tiktok.com/@eidgaming003id?lang=en' },
   { name: 'Fox🦊', avatar: 'https://i.imgur.com/PdjoEFU.jpeg', link: 'https://www.tiktok.com/@sayeedfox' },
   { name: 'Kujoo', avatar: 'https://i.imgur.com/bdbJA8s.jpeg', link: 'https://www.tiktok.com/@kujoo.gm?_r=1&_t=ZS-95IYDmnEddc' },
+  { name: 'PaNda', avatar: 'https://i.imgur.com/mJ5lrrq.png', link: 'https://www.tiktok.com/@__panda__76' },
   //{ name: 'Nefelibata', avatar: 'https://i.imgur.com/DvuUmvk.jpeg', link: 'https://www.tiktok.com/@rison098?lang=en' },
   { name: 'Issa gaming', avatar: 'https://i.imgur.com/Hhd4Hzn.jpeg', link: 'https://www.tiktok.com/@issagamingg?lang=en' },
   //{ name: 'Tripleh Gaming', avatar:'https://i.imgur.com/aeZ2S5y.jpeg', link: 'https://www.tiktok.com/@triplehgaming?lang=en-GB'},
