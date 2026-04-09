@@ -466,7 +466,7 @@ export default function RulesClient({ lang, L }: any) {
                 { typeAr: 'كليك لافر', typeEn: 'Click Lovers', criminals: '3', police: '4', hostages: '1', outside: '2' },
                 { typeAr: 'الامونيشن', typeEn: 'Ammunation', criminals: '4', police: '5', hostages: '1', outside: '2' },
                 { typeAr: 'البنك الفرعي', typeEn: 'Fleeca Bank', criminals: '5', police: '6', hostages: '2', outside: '2' },
-                { typeAr: 'موني اكستشانج', typeEn: 'Money Exchange', criminals: '5', police: '6', hostages: '2', outside: '2' },
+                { typeAr: 'موني اكستشانج', typeEn: 'Money Exchange', criminals: '6', police: '7', hostages: '2', outside: '2' },
                 { typeAr: 'البنك المركزي', typeEn: 'Pacific Bank', criminals: '7', police: '9', hostages: '3', outside: '1' },
             ],
 
