@@ -8,9 +8,53 @@ function trim(s: unknown, n: number) {
   return x.length > n ? x.slice(0, n) : x;
 }
 
+async function getDiscordMember(discordId: string) {
+  const res = await fetch(
+    `https://discord.com/api/v10/guilds/${process.env.DISCORD_GUILD_ID}/members/${discordId}`,
+    {
+      headers: {
+        Authorization: `Bot ${process.env.DISCORD_BOT_TOKEN}`,
+      },
+    }
+  );
+
+  if (!res.ok) return null;
+  return res.json();
+}
+
+
+
 export async function POST(req: Request) {
   const session = await getServerSession(authOptions);
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+  const discordId = (session.user as any)?.id;
+
+  if (!discordId) {
+    return NextResponse.json({ error: 'Discord ID missing' }, { status: 400 });
+  }
+
+  const member = await getDiscordMember(discordId);
+
+  if (!member) {
+    return NextResponse.json({ error: 'User not found in Discord server' }, { status: 403 });
+  }
+
+  const userRoles: string[] = member.roles || [];
+
+  const blockedRoles = [
+    process.env.DISCORD_ROLE_WHITELIST,
+    process.env.DISCORD_ROLE_REJECTED,
+  ].filter(Boolean);
+
+  const hasBlockedRole = userRoles.some(role => blockedRoles.includes(role));
+
+  if (hasBlockedRole) {
+    return NextResponse.json(
+      { error: 'You already applied or are not eligible to apply again.' },
+      { status: 403 }
+    );
+  }
 
   const webhook = process.env.DISCORD_INTERVIEW_WEBHOOK;
   if (!webhook) return NextResponse.json({ error: 'Missing DISCORD_INTERVIEW_WEBHOOK' }, { status: 500 });
@@ -76,7 +120,7 @@ export async function POST(req: Request) {
   // Add role + applicant mention
   const roleId = process.env.DISCORD_INTERVIEW_REVIEW_ROLE_ID;
   const discordUser = session.user?.name || session.user?.email || 'Unknown User';
-  const discordId = (session.user as any)?.id;
+  //const discordId = (session.user as any)?.id;
   const discordMention = discordId ? `<@${discordId}>` : discordUser;
 
   if (roleId) {
