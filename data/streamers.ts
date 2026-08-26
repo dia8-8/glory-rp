@@ -1,6 +1,7 @@
 export const STREAMERS = [
-  { name: 'Samir Farhat', avatar: 'https://files.kick.com/images/user/36977875/profile_image/conversion/0bc53f21-7198-4641-90b4-9d39272afe89-fullsize.webp', link: 'https://kick.com/samirfarhat' },
-  { name: 'Derrad', avatar: 'https://i.imgur.com/HEG7NQ8.png', link: 'https://www.twitch.tv/derrad_ggz' },
+  { name: 'Derrad', avatar: 'https://i.imgur.com/HEG7NQ8.png', link: 'https://www.twitch.tv/derrad_ggz'},
+  { name: 'Nefelibata', avatar: 'https://i.imgur.com/ZE33fCa.jpeg', link: 'https://www.tiktok.com/@rison098'},
+  { name: 'Ayman Gaming', avatar: 'https://i.imgur.com/HEG7NQ8.png', link: 'https://i.imgur.com/n5OK30k.jpeg'},
   { name: 'Eid Gaming', avatar: 'https://i.imgur.com/PFOGt8v.jpeg', link: 'https://www.tiktok.com/@eidgaming003id?lang=en' },
   { name: 'Fox🦊', avatar: 'https://i.imgur.com/PdjoEFU.jpeg', link: 'https://www.tiktok.com/@sayeedfox' },
   { name: 'Kujoo', avatar: 'https://i.imgur.com/bdbJA8s.jpeg', link: 'https://www.tiktok.com/@kujoo.gm?_r=1&_t=ZS-95IYDmnEddc' },
@@ -8,6 +9,7 @@ export const STREAMERS = [
   { name: 'ZiadNJ', avatar: 'https://i.imgur.com/Q0BGMRs.jpeg', link: 'https://www.tiktok.com/@ziadnj' },
   { name: 'ElHaram TV', avatar: 'https://i.imgur.com/hJteAnT.jpeg', link: 'https://www.tiktok.com/@elharam_tv' },
   { name: 'Ra3d', avatar: 'https://i.imgur.com/rSJllPz.jpeg', link: 'https://www.tiktok.com/@3mrra3d' },
+  { name: 'King', avatar: 'https://i.imgur.com/zXeI9RQ.jpeg', link: 'https://www.tiktok.com/@tiktokar5085'},
   //{ name: 'Nefelibata', avatar: 'https://i.imgur.com/DvuUmvk.jpeg', link: 'https://www.tiktok.com/@rison098?lang=en' },
   { name: 'Issa gaming', avatar: 'https://i.imgur.com/Hhd4Hzn.jpeg', link: 'https://www.tiktok.com/@issagamingg?lang=en' },
   //{ name: 'Tripleh Gaming', avatar:'https://i.imgur.com/aeZ2S5y.jpeg', link: 'https://www.tiktok.com/@triplehgaming?lang=en-GB'},
