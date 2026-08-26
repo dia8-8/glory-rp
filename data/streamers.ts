@@ -1,7 +1,7 @@
 export const STREAMERS = [
   { name: 'Derrad', avatar: 'https://i.imgur.com/HEG7NQ8.png', link: 'https://www.twitch.tv/derrad_ggz'},
   { name: 'Nefelibata', avatar: 'https://i.imgur.com/ZE33fCa.jpeg', link: 'https://www.tiktok.com/@rison098'},
-  { name: 'Ayman Gaming', avatar: 'https://i.imgur.com/HEG7NQ8.png', link: 'https://i.imgur.com/n5OK30k.jpeg'},
+  { name: 'Ayman Gaming', avatar: 'https://i.imgur.com/zXeI9RQ.jpeg', link: 'https://i.imgur.com/n5OK30k.jpeg'},
   { name: 'Eid Gaming', avatar: 'https://i.imgur.com/PFOGt8v.jpeg', link: 'https://www.tiktok.com/@eidgaming003id?lang=en' },
   { name: 'Fox🦊', avatar: 'https://i.imgur.com/PdjoEFU.jpeg', link: 'https://www.tiktok.com/@sayeedfox' },
   { name: 'Kujoo', avatar: 'https://i.imgur.com/bdbJA8s.jpeg', link: 'https://www.tiktok.com/@kujoo.gm?_r=1&_t=ZS-95IYDmnEddc' },
