@@ -2,7 +2,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ShoppingCart, Package, Percent, Timer, CheckCircle2, XCircle, ShieldCheck, Check } from 'lucide-react';
+import { ShoppingCart, Package, Percent, Timer, CheckCircle2, XCircle, ShieldCheck, Check, Store, Car, Home, User } from 'lucide-react';
 import clsx from 'clsx';
 import { useLang } from '@/lib/providers';
 import { useCart } from './useCart';
@@ -20,6 +20,14 @@ export type StoreData = { currency: string; products: Product[]; bundles: Bundle
 const SYMBOL: Record<string, string> = { USD: '$', EUR: '€', GBP: '£', SAR: 'SAR ', AED: 'AED ' };
 /** Same output on server and browser (no Intl), so no hydration mismatch */
 export const money = (n: number, cur: string) => `${SYMBOL[cur] ?? cur + ' '}${n.toFixed(2).replace(/\.00$/, '')}`;
+
+/** Category sections shown under "All", in this order */
+const CATEGORY_SECTIONS = [
+  { key: 'business', en: 'Businesses', ar: 'المشاريع', Icon: Store },
+  { key: 'vehicle', en: 'Vehicles', ar: 'المركبات', Icon: Car },
+  { key: 'property', en: 'Property & Gangs', ar: 'العقارات والعصابات', Icon: Home },
+  { key: 'personal', en: 'Personal', ar: 'شخصي', Icon: User },
+];
 
 const TABS = [
   { key: 'all', en: 'All', ar: 'الكل' },
@@ -185,44 +193,60 @@ export default function StoreFront({ data, status, reason }: { data: StoreData; 
         </section>
       )}
 
-      {/* Products */}
-      {tab !== 'bundles' && (
-        <>
-          {tab === 'all' && showBundles && <h2 className="mb-4 text-xl font-bold">{isAr ? 'كل المنتجات' : 'All products'}</h2>}
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {products.map((p) => (
-              <article key={p.id} className="card card-hover group flex flex-col overflow-hidden">
-                <div className="relative aspect-[5/3] overflow-hidden bg-ink">
-                  {p.image ? <Image src={p.image} alt={tr(p.name)} fill sizes="(min-width:1280px) 25vw, (min-width:640px) 50vw, 100vw" unoptimized={p.image.startsWith('http')} className="object-cover transition duration-500 group-hover:scale-110" /> : <div className="grid h-full place-items-center"><ShoppingCart className="h-10 w-10 text-brand/40" /></div>}
-                  <div className="absolute inset-0 bg-gradient-to-t from-surface via-surface/10 to-transparent" />
-                  <div className="absolute start-3 top-3 flex gap-2">
-                    {p.salePrice !== null && <span className="rounded-md bg-brand px-2 py-1 text-xs font-extrabold text-ink">-{p.salePercent}%</span>}
-                    {tr(p.badge) && <span className="rounded-md bg-ink/80 px-2 py-1 text-xs font-bold backdrop-blur">{tr(p.badge)}</span>}
-                  </div>
+      {/* Products — grouped by category under "All", one grid otherwise */}
+      {tab !== 'bundles' &&
+        (tab === 'all'
+          ? CATEGORY_SECTIONS.map((c) => ({ ...c, items: data.products.filter((p) => p.category === c.key) }))
+          : [{ key: tab, en: '', ar: '', Icon: null, items: products }]
+        )
+          .filter((g) => g.items.length > 0)
+          .map((g) => (
+            <section key={g.key} className="mb-12 scroll-mt-28" id={tab === 'all' ? `cat-${g.key}` : undefined}>
+              {g.Icon && (
+                <div className="mb-4 flex items-center justify-between gap-3">
+                  <h2 className="flex items-center gap-2 text-xl font-bold">
+                    <g.Icon className="h-5 w-5 text-brand" /> {isAr ? g.ar : g.en}
+                    <span className="text-sm font-medium text-white/35">({g.items.length})</span>
+                  </h2>
+                  <button onClick={() => { setTab(g.key); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="text-sm text-brand hover:underline">
+                    {isAr ? 'عرض القسم' : 'View category'}
+                  </button>
                 </div>
-                <div className="flex flex-1 flex-col p-5 pt-2">
-                  <h3 className="text-lg font-bold transition group-hover:text-brand">{tr(p.name)}</h3>
-                  {tr(p.desc) && <p className="mt-1 line-clamp-3 text-sm text-white/55">{tr(p.desc)}</p>}
-                  {p.saleEnds && (
-                    <p className="mt-2 flex items-center gap-1 text-xs text-brand/90"><Timer className="h-3.5 w-3.5" /> {isAr ? 'العرض ينتهي خلال' : 'Sale ends in'} <Countdown to={p.saleEnds} isAr={isAr} /></p>
-                  )}
-                  <div className="mt-auto flex items-end justify-between gap-3 pt-4">
-                    <div dir="ltr">
-                      {p.salePrice !== null && <span className="me-2 text-sm text-white/40 line-through">{money(p.price, data.currency)}</span>}
-                      <span className="text-xl font-extrabold text-brand">{money(p.salePrice ?? p.price, data.currency)}</span>
+              )}
+              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                {g.items.map((p) => (
+                <article key={p.id} className="card card-hover group flex flex-col overflow-hidden">
+                  <div className="relative aspect-[5/3] overflow-hidden bg-ink">
+                    {p.image ? <Image src={p.image} alt={tr(p.name)} fill sizes="(min-width:1280px) 25vw, (min-width:640px) 50vw, 100vw" unoptimized={p.image.startsWith('http')} className="object-cover transition duration-500 group-hover:scale-110" /> : <div className="grid h-full place-items-center"><ShoppingCart className="h-10 w-10 text-brand/40" /></div>}
+                    <div className="absolute inset-0 bg-gradient-to-t from-surface via-surface/10 to-transparent" />
+                    <div className="absolute start-3 top-3 flex gap-2">
+                      {p.salePrice !== null && <span className="rounded-md bg-brand px-2 py-1 text-xs font-extrabold text-ink">-{p.salePercent}%</span>}
+                      {tr(p.badge) && <span className="rounded-md bg-ink/80 px-2 py-1 text-xs font-bold backdrop-blur">{tr(p.badge)}</span>}
                     </div>
-                    {coveredByBundle.has(p.id) ? (
-                      <span className="btn btn-ghost shrink-0 cursor-default text-xs text-white/50"><Package className="h-4 w-4" /> {isAr ? 'ضمن باقة' : 'In a bundle'}</span>
-                    ) : (
-                      <CartButton inCart={cart.has('product', p.id)} onClick={() => toggle('product', p.id)} isAr={isAr} />
-                    )}
                   </div>
-                </div>
-              </article>
-            ))}
-          </div>
-        </>
-      )}
+                  <div className="flex flex-1 flex-col p-5 pt-2">
+                    <h3 className="text-lg font-bold transition group-hover:text-brand">{tr(p.name)}</h3>
+                    {tr(p.desc) && <p className="mt-1 line-clamp-3 text-sm text-white/55">{tr(p.desc)}</p>}
+                    {p.saleEnds && (
+                      <p className="mt-2 flex items-center gap-1 text-xs text-brand/90"><Timer className="h-3.5 w-3.5" /> {isAr ? 'العرض ينتهي خلال' : 'Sale ends in'} <Countdown to={p.saleEnds} isAr={isAr} /></p>
+                    )}
+                    <div className="mt-auto flex items-end justify-between gap-3 pt-4">
+                      <div dir="ltr">
+                        {p.salePrice !== null && <span className="me-2 text-sm text-white/40 line-through">{money(p.price, data.currency)}</span>}
+                        <span className="text-xl font-extrabold text-brand">{money(p.salePrice ?? p.price, data.currency)}</span>
+                      </div>
+                      {coveredByBundle.has(p.id) ? (
+                        <span className="btn btn-ghost shrink-0 cursor-default text-xs text-white/50"><Package className="h-4 w-4" /> {isAr ? 'ضمن باقة' : 'In a bundle'}</span>
+                      ) : (
+                        <CartButton inCart={cart.has('product', p.id)} onClick={() => toggle('product', p.id)} isAr={isAr} />
+                      )}
+                    </div>
+                  </div>
+                </article>
+                ))}
+              </div>
+            </section>
+          ))}
 
       {/* Floating cart button */}
       {cart.ready && cart.items.length > 0 && !cartOpen && (
