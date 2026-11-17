@@ -16,7 +16,8 @@ export default async function VipShopPage({ searchParams }: { searchParams: Reco
   const Arrow = isAr ? ArrowLeft : ArrowRight;
   // Tebex store once it's set up with at least one product; until then the old shop + form
   const store = await getStorefront();
-  const status = searchParams.paid ? 'paid' : searchParams.cancelled ? 'cancelled' : searchParams.error ? 'error' : null;
+  const status = searchParams.paid ? 'paid' : searchParams.cancelled ? 'cancelled' : searchParams.error === 'expired' ? 'expired' : searchParams.error ? 'error' : null;
+  const reason = typeof searchParams.reason === 'string' ? searchParams.reason.slice(0, 200) : null;
 
   return (
     <main className="page-shell text-white">
@@ -41,7 +42,7 @@ export default async function VipShopPage({ searchParams }: { searchParams: Reco
         </header>
 
         {store.mode === 'tebex' ? (
-          <StoreFront data={store} status={status} />
+          <StoreFront data={store} status={status} reason={reason} />
         ) : (
           <>
             <VipGrid />

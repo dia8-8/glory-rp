@@ -4,7 +4,7 @@ import { createHmac, timingSafeEqual } from 'node:crypto';
 import { db } from './db';
 import { SITE } from '@/lib/site';
 import { saleByProduct, type BundleRow, type ProductRow, type SaleRow } from './store';
-import { addPackageToBasket, applyCoupon, createBasket, getBasket, getBasketAuthLinks, getWebstore, TebexError } from './tebex';
+import { addPackageToBasket, applyCoupon, createBasket, getBasket, getBasketAuthLinks, TebexError } from './tebex';
 
 export type CheckoutItems = { basket: string; packages: string[]; coupons: string[]; exp: number };
 export type CartItem = { kind: 'product' | 'bundle'; id: string };
@@ -123,14 +123,30 @@ export async function startCheckout(opts: { items: CartItem[]; ip?: string; disc
     })
   );
 
-  const store = await step('Reading the store settings', () => getWebstore());
-  if (store.supports_usernames) {
-    const token = signItems({ basket: basket.ident, packages, coupons, exp: Date.now() + 30 * 60_000 });
-    const links = await step('Getting the FiveM login link', () =>
-      getBasketAuthLinks(basket.ident, `${SITE.url}/api/store/continue?t=${encodeURIComponent(token)}`)
-    );
-    if (!links.length) throw new TebexError('Tebex did not return a sign-in link for this store.');
-    return links[0].url;
+  return loginOrPay(basket.ident, packages, coupons);
+}
+
+/**
+ * FiveM stores need the buyer to log in with their cfx.re account (that's how Tebex knows which
+ * player gets the items). Tebex runs that login itself: we ask it for the login link and, if it
+ * offers one, send the buyer there first. Tebex then returns them to /api/store/continue, which
+ * fills the basket and forwards to payment. If Tebex offers no login, go straight to payment.
+ */
+export async function loginOrPay(basketIdent: string, packages: string[], coupons: string[]) {
+  const token = signItems({ basket: basketIdent, packages, coupons, exp: Date.now() + 30 * 60_000 });
+  const returnUrl = `${SITE.url}/api/store/continue?t=${encodeURIComponent(token)}`;
+
+  let links: { name: string; url: string }[] = [];
+  try {
+    links = await getBasketAuthLinks(basketIdent, returnUrl);
+  } catch (e) {
+    // a 4xx here means this store has no login step; anything else is a real problem
+    if (!(e instanceof TebexError) || e.status >= 500) throw new TebexError(`Getting the FiveM login link: ${(e as Error).message}`);
   }
-  return fillAndGetCheckoutUrl(basket.ident, packages, coupons);
+  if (links.length) {
+    // prefer the FiveM / cfx.re option if Tebex lists several
+    const fivem = links.find((l) => /fivem|cfx/i.test(`${l.name} ${l.url}`));
+    return (fivem ?? links[0]).url;
+  }
+  return fillAndGetCheckoutUrl(basketIdent, packages, coupons);
 }

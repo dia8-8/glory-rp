@@ -157,20 +157,39 @@ export async function getBasketAuthLinks(basketIdent: string, returnUrl: string)
   return Array.isArray(j) ? j : j?.data ?? [];
 }
 
+/**
+ * POSTs to the first address Tebex recognises. Tebex's docs disagree on some basket paths
+ * (guide: /api/baskets/{ident}/…, spec: /api/accounts/{token}/{ident}/…), so we try each form.
+ * Only "not found / not allowed" moves on to the next one; any other error (e.g. 422) is real and is thrown.
+ */
+async function postFirstWorking<T>(urls: string[], body: unknown): Promise<T> {
+  let last: TebexError | null = null;
+  for (const url of urls) {
+    try {
+      return await call<T>(url, { method: 'POST', body: JSON.stringify(body) });
+    } catch (e) {
+      if (!(e instanceof TebexError) || ![404, 405].includes(e.status)) throw e;
+      last = e;
+    }
+  }
+  throw last ?? new TebexError('Tebex basket address not found.');
+}
+
 export async function addPackageToBasket(basketIdent: string, packageId: string | number, quantity = 1) {
-  // Path as documented: /{basketIdent}/packages (no /baskets prefix)
-  const j = await call<{ data: Basket }>(`${base()}/${encodeURIComponent(basketIdent)}/packages`, {
-    method: 'POST',
-    body: JSON.stringify({ package_id: String(packageId), quantity }),
-  });
+  const b = encodeURIComponent(basketIdent);
+  const j = await postFirstWorking<{ data: Basket }>(
+    [`${HEADLESS.replace('/accounts', '')}/baskets/${b}/packages`, `${base()}/baskets/${b}/packages`, `${base()}/${b}/packages`],
+    { package_id: String(packageId), quantity }
+  );
   return j.data;
 }
 
 export async function applyCoupon(basketIdent: string, code: string) {
-  return call<{ success: boolean; message: string }>(`${base()}/baskets/${encodeURIComponent(basketIdent)}/coupons`, {
-    method: 'POST',
-    body: JSON.stringify({ coupon_code: code }),
-  });
+  const b = encodeURIComponent(basketIdent);
+  return postFirstWorking<{ success: boolean; message: string }>(
+    [`${base()}/baskets/${b}/coupons`, `${HEADLESS.replace('/accounts', '')}/baskets/${b}/coupons`],
+    { coupon_code: code }
+  );
 }
 
 export async function getBasket(basketIdent: string) {

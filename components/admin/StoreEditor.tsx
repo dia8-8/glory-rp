@@ -591,9 +591,9 @@ function Connection({ snap, isAr }: Ctx) {
           <Row
             ok
             title={isAr ? 'تسجيل الدخول عند الدفع' : 'Login at checkout'}
-            detail={t.store.usernames
-              ? (isAr ? 'يسجل المشتري دخوله بحساب FiveM (cfx.re) قبل الدفع حتى يعرف Tebex لمن يسلّم.' : 'Buyers log in with their FiveM (cfx.re) account before paying, so Tebex knows who to deliver to.')
-              : (isAr ? 'لا يحتاج المتجر تسجيل دخول.' : 'This store doesn’t need a login.')}
+            detail={isAr
+              ? 'عند الدفع يرسل الموقع المشتري لصفحة تسجيل الدخول في Tebex (حساب FiveM / cfx.re) حتى يعرف Tebex لمن يسلّم المشتريات.'
+              : 'At checkout the site sends buyers to Tebex’s login page (FiveM / cfx.re account) so Tebex knows who to deliver to.'}
           />
         )}
       </ul>

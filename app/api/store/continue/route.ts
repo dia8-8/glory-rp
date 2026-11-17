@@ -15,7 +15,9 @@ export async function GET(req: Request) {
     const url = await fillAndGetCheckoutUrl(items.basket, items.packages, items.coupons);
     return NextResponse.redirect(url);
   } catch (e) {
-    console.error('[checkout/continue]', (e as Error).message);
-    return NextResponse.redirect(`${SITE.url}/vipshop?error=checkout`);
+    const msg = String((e as Error)?.message ?? e);
+    console.error('[checkout/continue]', msg);
+    // Pass the reason to the store page so the player (and staff) can see what went wrong
+    return NextResponse.redirect(`${SITE.url}/vipshop?error=checkout&reason=${encodeURIComponent(msg.slice(0, 200))}`);
   }
 }

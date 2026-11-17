@@ -46,7 +46,7 @@ export function Countdown({ to, isAr }: { to: string; isAr: boolean }) {
   return <span dir="ltr">{parts.filter(Boolean).join(' ')}</span>;
 }
 
-export default function StoreFront({ data, status }: { data: StoreData; status?: 'paid' | 'cancelled' | 'error' | null }) {
+export default function StoreFront({ data, status, reason }: { data: StoreData; status?: 'paid' | 'cancelled' | 'error' | 'expired' | null; reason?: string | null }) {
   const { lang } = useLang();
   const isAr = lang === 'ar';
   const tr = (b: Bi) => (isAr ? b.ar || b.en : b.en || b.ar);
@@ -54,7 +54,13 @@ export default function StoreFront({ data, status }: { data: StoreData; status?:
   const cart = useCart();
   const [cartOpen, setCartOpen] = useState(false);
   const [bump, setBump] = useState(0);
-  const [error, setError] = useState<string | null>(status === 'error' ? (isAr ? 'تعذر إكمال الدفع. حاول مرة أخرى.' : 'The checkout couldn’t be completed. Please try again.') : null);
+  const [error, setError] = useState<string | null>(
+    status === 'expired'
+      ? isAr ? 'انتهت صلاحية رابط الدفع. أضف المنتجات للسلة واضغط إتمام الشراء مرة أخرى.' : 'The checkout link expired. Press Checkout in your cart again.'
+      : status === 'error'
+        ? (isAr ? 'تعذر إكمال الدفع. حاول مرة أخرى.' : 'The checkout couldn’t be completed. Please try again.') + (reason ? ` (${reason})` : '')
+        : null
+  );
   const [banner, setBanner] = useState(status);
 
   const counts = useMemo(() => {

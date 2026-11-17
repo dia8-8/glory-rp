@@ -141,14 +141,22 @@ export default function CartDrawer({
                   <span className="text-white/70">{isAr ? 'المجموع' : 'Total'}</span>
                   <span className="text-2xl font-extrabold text-brand" dir="ltr">{money(total, data.currency)}</span>
                 </div>
-                <p className="text-xs text-white/40">
-                  {isAr
-                    ? 'السعر النهائي (مع أي ضرائب) يظهر في صفحة الدفع في Tebex. قد يُطلب منك تسجيل الدخول بحساب FiveM.'
-                    : 'The final price (with any taxes) is shown on the Tebex payment page. You may be asked to log in with your FiveM account.'}
-                </p>
+                {/* What happens next */}
+                <ol className="space-y-1.5 rounded-xl border border-white/[0.06] bg-ink/40 p-3 text-xs text-white/60">
+                  {[
+                    { en: 'Log in with your FiveM (cfx.re) account — so the items go to your character', ar: 'سجّل الدخول بحساب FiveM (cfx.re) — لتصل المشتريات لشخصيتك' },
+                    { en: 'Pay securely on Tebex (final price with any taxes shown there)', ar: 'ادفع بأمان عبر Tebex (السعر النهائي مع الضرائب يظهر هناك)' },
+                    { en: 'Items arrive in game + your Discord role is added automatically', ar: 'تصلك المشتريات داخل اللعبة وتُضاف رتبة الديسكورد تلقائيًا' },
+                  ].map((st, i) => (
+                    <li key={i} className="flex gap-2">
+                      <span className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-brand/15 text-[10px] font-bold text-brand">{i + 1}</span>
+                      {isAr ? st.ar : st.en}
+                    </li>
+                  ))}
+                </ol>
                 <button onClick={checkout} disabled={busy} className="btn btn-primary h-12 w-full text-base">
                   {busy ? <Loader2 className="h-5 w-5 animate-spin" /> : <Lock className="h-4 w-4" />}
-                  {isAr ? 'إتمام الشراء' : 'Checkout'}
+                  {isAr ? 'تسجيل الدخول بـ FiveM والدفع' : 'Log in with FiveM & pay'}
                 </button>
                 <button onClick={() => cart.clear()} disabled={busy} className="w-full text-center text-xs text-white/40 hover:text-red-300">
                   {isAr ? 'إفراغ السلة' : 'Empty cart'}
