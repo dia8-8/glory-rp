@@ -14,8 +14,9 @@ export const SITE = {
   fivemAddress: process.env.NEXT_PUBLIC_FIVEM_ADDRESS || '',
   discordInvite: BRAND.discord.split('/').pop() || '',
   /** Shown when the live Discord count can't be fetched */
-  fallbackMembers: 3200,
-  fallbackFollowers: 300,
+  fallbackMembers: 4100,
+  /** TikTok has no public follower API, so this number is always shown — update it by hand */
+  fallbackFollowers: 450,
 };
 
 /** fivem:// link that opens FiveM and joins the server, or '' if not configured */
