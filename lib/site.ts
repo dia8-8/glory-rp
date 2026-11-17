@@ -4,12 +4,12 @@
  *
  *   NEXT_PUBLIC_FIVEM_CFX_CODE   your cfx.re join code, e.g. "abc123" (from cfx.re/join/abc123)
  *   NEXT_PUBLIC_FIVEM_ADDRESS    or a direct "ip:port" if you have no cfx code
- *   NEXT_PUBLIC_SITE_URL         full site URL, used for link previews
  */
 import { BRAND } from './brand';
 
 export const SITE = {
-  url: process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000',
+  /** Public address of the live site — used in Discord DMs and link previews. No trailing slash. */
+  url: 'https://gloryrp.vercel.app',
   fivemCfxCode: process.env.NEXT_PUBLIC_FIVEM_CFX_CODE || '',
   fivemAddress: process.env.NEXT_PUBLIC_FIVEM_ADDRESS || '',
   discordInvite: BRAND.discord.split('/').pop() || '',

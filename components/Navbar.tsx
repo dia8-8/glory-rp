@@ -1,6 +1,7 @@
 import { t, getLang } from '@/lib/i18n';
 import LanguageToggle from './LanguageToggle';
 import AuthButtons from './AuthButtons';
+import NotificationBell from './NotificationBell';
 import JoinUsCta from './JoinUsCta';
 import NavbarShell from './NavbarShell';
 
@@ -22,6 +23,7 @@ export default function Navbar() {
       actions={
         <>
           <LanguageToggle />
+          <NotificationBell />
           <AuthButtons />
         </>
       }

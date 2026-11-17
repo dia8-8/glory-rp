@@ -3,35 +3,14 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { db, TABLE, type Submission, type SubmissionStatus } from '@/lib/server/db';
 import { isStaff, addRole, removeRole, sendDM } from '@/lib/server/discord';
-import { JOBS } from '@/lib/jobs';
+import { decisionMessage, dmText } from '@/lib/server/messages';
+import { notify } from '@/lib/server/notify';
 
 export const dynamic = 'force-dynamic';
 
 const ALLOWED: SubmissionStatus[] = ['pending', 'accepted', 'rejected', 'under18', 'closed'];
 
-function dmText(s: Submission, status: SubmissionStatus, note?: string) {
-  const reason = note ? `\n\n📝 ${note}` : '';
-  const site = process.env.NEXT_PUBLIC_SITE_URL ? `\n${process.env.NEXT_PUBLIC_SITE_URL}/status` : '';
-  if (s.kind === 'interview') {
-    if (status === 'under18') {
-      return `🔞 **Glory RP** — You must be **18 or older** to join the server. You can apply again once you turn 18.
-🔞 يجب أن يكون عمرك **18 سنة أو أكثر** للانضمام للسيرفر. يمكنك التقديم مجددًا عند بلوغك 18.${reason}`;
-    }
-    return status === 'accepted'
-      ? `✅ **Glory RP** — Your join interview was **accepted**! Welcome to the city.\n✅ تم **قبول** مقابلة الانضمام الخاصة بك! مرحبًا بك في جلوري.${reason}${site}`
-      : `❌ **Glory RP** — Your join interview was **not accepted**.\n❌ لم يتم قبول مقابلة الانضمام الخاصة بك.${reason}`;
-  }
-  if (s.kind === 'job') {
-    const job = (JOBS as Record<string, any>)[s.category];
-    const name = job ? `${job.titleEn} / ${job.titleAr}` : s.category;
-    return status === 'accepted'
-      ? `✅ **Glory RP** — Your **${name}** application was **accepted**! Staff will contact you with next steps.\n✅ تم قبول طلبك.${reason}`
-      : `❌ **Glory RP** — Your **${name}** application was **not accepted**.\n❌ لم يتم قبول طلبك.${reason}`;
-  }
-  return `📬 **Glory RP** — Your ${s.kind === 'ticket' ? 'ticket' : 'request'} (${s.category}) was **${status}**.\n📬 تم تحديث طلبك.${reason}`;
-}
-
-/** PATCH { status, note?, notify? } — staff only. Applies Discord roles for interviews and DMs the player. */
+/** PATCH { status, note?, notify? } — staff only. Applies Discord roles for interviews, notifies the player on the site, and (optionally) by DM. */
 export async function PATCH(req: Request, { params }: { params: { id: string } }) {
   const session = await getServerSession(authOptions);
   const staffId = session?.user?.id;
@@ -43,7 +22,7 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
   const body = await req.json().catch(() => ({}));
   const status = body.status as SubmissionStatus;
   const note = typeof body.note === 'string' ? body.note.trim().slice(0, 500) : '';
-  const notify = body.notify !== false;
+  const sendDm = body.notify !== false;
   if (!ALLOWED.includes(status)) return NextResponse.json({ error: 'Bad status' }, { status: 400 });
 
   const { data: current, error: readErr } = await client.from(TABLE).select('*').eq('id', params.id).single();
@@ -79,7 +58,15 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
     const removed = guestId ? await removeRole(sub.discord_id, guestId) : false;
     result.roles = added && removed;
   }
-  if (notify && status !== 'pending') result.dm = await sendDM(sub.discord_id, dmText(sub, status, note));
+  // Tell the player: always on the site (bell), and by Discord DM unless staff unticked it
+  if (status !== 'pending') {
+    const message = decisionMessage(sub, status);
+    const [, dm] = await Promise.all([
+      notify(sub.discord_id, message, note),
+      sendDm ? sendDM(sub.discord_id, dmText(message, note)) : Promise.resolve(null),
+    ]);
+    result.dm = dm;
+  }
 
   return NextResponse.json({ item: updated, ...result });
 }

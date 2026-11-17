@@ -5,6 +5,7 @@ import {
   Check, X, Archive, RotateCcw, Baby, Search, RefreshCw, Inbox, ExternalLink, Database, Copy, ShieldCheck,
 } from 'lucide-react';
 import { useLang } from '@/lib/providers';
+import { timeAgo } from '@/lib/timeAgo';
 
 type Bi = { en: string; ar: string };
 export type Labels = { fields: Record<string, Bi>; categories: Record<string, Bi> };
@@ -48,23 +49,6 @@ const STATUS_STYLE: Record<Status, string> = {
   under18: 'bg-orange-400/10 text-orange-300 ring-orange-400/30',
   closed: 'bg-white/5 text-white/60 ring-white/15',
 };
-
-function timeAgo(iso: string, isAr: boolean) {
-  const sec = Math.max(1, Math.round((Date.now() - new Date(iso).getTime()) / 1000));
-  const steps: [number, string, string][] = [
-    [60, 's', 'ث'],
-    [3600, 'm', 'د'],
-    [86400, 'h', 'س'],
-    [2592000, 'd', 'ي'],
-    [31536000, 'mo', 'ش'],
-    [Infinity, 'y', 'سنة'],
-  ];
-  const div = [1, 60, 3600, 86400, 2592000, 31536000];
-  const i = steps.findIndex(([limit]) => sec < limit);
-  const v = Math.floor(sec / div[i]);
-  const unit = isAr ? steps[i][2] : steps[i][1];
-  return isAr ? `منذ ${v}${unit}` : `${v}${unit} ago`;
-}
 
 export default function AdminDashboard({ labels, configured }: { labels: Labels; configured: boolean }) {
   const { lang } = useLang();
@@ -261,7 +245,8 @@ function StatusBadge({ status, isAr }: { status: Status; isAr: boolean }) {
 function Detail({
   item, labels, isAr, onUpdated,
 }: { item: Item; labels: Labels; isAr: boolean; onUpdated: (i: Item) => void }) {
-  const [note, setNote] = useState(item.note ?? '');
+  // Always starts empty so an old note is never re-sent with a new decision
+  const [note, setNote] = useState('');
   const [notify, setNotify] = useState(true);
   const [busy, setBusy] = useState<Status | null>(null);
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
@@ -284,6 +269,7 @@ function Detail({
     setBusy(null);
     if (!r?.ok) return setMsg({ ok: false, text: j.error || 'Error' });
     onUpdated(j.item);
+    setNote('');
     const parts = [isAr ? 'تم الحفظ' : 'Saved'];
     if (j.roles === true) parts.push(isAr ? 'تم تحديث الرتب' : 'roles updated');
     if (j.missingEnv?.length) parts.push((isAr ? '⚠️ إعداد ناقص: ' : '⚠️ missing setting: ') + j.missingEnv.join(', '));
@@ -337,10 +323,15 @@ function Detail({
       </dl>
 
       {item.reviewed_by && (
-        <p className="mt-4 text-xs text-white/40">
+        <div className="mt-4 rounded-xl border border-white/[0.06] p-3 text-xs text-white/45">
           {isAr ? 'آخر مراجعة: ' : 'Last reviewed by '}
-          {item.reviewed_by}
-        </p>
+          <span className="text-white/70">{item.reviewed_by}</span>
+          {item.note && (
+            <p className="mt-1.5 text-white/60">
+              {isAr ? 'الملاحظة السابقة: ' : 'Previous note: '}“{item.note}”
+            </p>
+          )}
+        </div>
       )}
 
       <div className="mt-5 border-t border-white/[0.06] pt-5">

@@ -2,6 +2,8 @@
 import { NextResponse } from 'next/server';
 import type { Session } from 'next-auth';
 import { db, TABLE, type SubmissionKind } from './db';
+import { notify } from './notify';
+import { receivedMessage } from './messages';
 
 /**
  * One call for API routes: checks limits, then saves the submission.
@@ -122,5 +124,6 @@ export async function recordSubmission(input: {
     console.error('[submissions] insert failed:', error.message);
     return null;
   }
+  await notify(input.discordId, receivedMessage(input.kind, input.category));
   return data.id as string;
 }
