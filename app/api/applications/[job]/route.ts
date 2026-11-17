@@ -5,6 +5,7 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { JOBS, type JobKey } from '@/lib/jobs';
+import { protectAndRecord } from '@/lib/server/submissions';
 
 export async function GET(_: Request, { params }: { params: { job: string } }) {
   return NextResponse.json({ ok: true, job: params.job });
@@ -27,6 +28,10 @@ export async function POST(req: Request, { params }: { params: { job: string } }
   if (missing.length) {
     return NextResponse.json({ error: `Missing: ${missing.join(', ')}` }, { status: 400 });
   }
+
+  // Spam protection + save for the staff dashboard
+  const blocked = await protectAndRecord(session, 'job', String(jobKey), payload);
+  if (blocked) return blocked;
 
   const webhook = process.env[job.webhookEnv] || process.env.DISCORD_APPLICATIONS_WEBHOOK;
   if (!webhook) return NextResponse.json({ error: 'Missing webhook env var' }, { status: 500 });

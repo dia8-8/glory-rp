@@ -2,6 +2,9 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
+import { protectAndRecord } from '@/lib/server/submissions';
+import { cookies } from 'next/headers';
+import { hasPassed, PASS_COOKIE } from '@/lib/server/quiz';
 
 function trim(s: unknown, n: number) {
   const x = String(s ?? '');
@@ -67,6 +70,18 @@ export async function POST(req: Request) {
   if (String(body.rulesOk) !== 'true' && body.rulesOk !== true) {
     return NextResponse.json({ error: 'You must accept the rules.' }, { status: 400 });
   }
+
+  // Must have passed the rules quiz (signed cookie set by /api/quiz)
+  if (!hasPassed(cookies().get(PASS_COOKIE)?.value, discordId)) {
+    return NextResponse.json(
+      { error: 'Please pass the rules quiz first. / يرجى اجتياز اختبار القوانين أولًا.' },
+      { status: 403 }
+    );
+  }
+
+  // Spam protection + save for the staff dashboard
+  const blocked = await protectAndRecord(session, 'interview', 'interview', body);
+  if (blocked) return blocked;
 
   // Applicant identity
   const discordName =

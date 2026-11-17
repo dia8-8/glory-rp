@@ -5,6 +5,7 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { CITYHALL, type CityhallKey } from '@/lib/cityhall';
+import { protectAndRecord } from '@/lib/server/submissions';
 
 export async function POST(req: Request, { params }: { params: { job: string } }) {
   try {
@@ -40,6 +41,10 @@ export async function POST(req: Request, { params }: { params: { job: string } }
     }
 
     // Webhook setup
+    // Spam protection + save for the staff dashboard
+    const blocked = await protectAndRecord(session, 'cityhall', String(categoryKey), payload);
+    if (blocked) return blocked;
+
     const webhook =
       process.env[category.webhookEnv] || process.env.DISCORD_CITYHALL_WEBHOOK;
     if (!webhook)

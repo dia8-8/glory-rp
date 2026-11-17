@@ -5,6 +5,7 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { TICKETS, type TicketKey } from '@/lib/tickets';
+import { protectAndRecord } from '@/lib/server/submissions';
 
 export async function POST(req: Request, { params }: { params: { category: string } }) {
   try {
@@ -32,6 +33,10 @@ export async function POST(req: Request, { params }: { params: { category: strin
       );
 
     // ✅ Webhook setup
+    // Spam protection + save for the staff dashboard
+    const blocked = await protectAndRecord(session, 'ticket', String(categoryKey), payload);
+    if (blocked) return blocked;
+
     const webhook = process.env[category.webhookEnv];
     if (!webhook)
       return NextResponse.json({ error: 'Missing webhook' }, { status: 500 });

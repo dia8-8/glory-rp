@@ -3,12 +3,29 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { getLang } from '@/lib/i18n-server';
 import { BRAND } from '@/lib/brand';
-import { CheckCircle2, XCircle, Clock, LogIn, ArrowUpRight } from 'lucide-react';
+import { CheckCircle2, XCircle, Clock, LogIn, ArrowUpRight, FilePlus2 } from 'lucide-react';
+import { db, TABLE } from '@/lib/server/db';
 
 export const dynamic = 'force-dynamic';
 export const metadata = { title: 'My Application' };
 
-type State = 'accepted' | 'rejected' | 'pending' | 'error';
+type State = 'accepted' | 'rejected' | 'pending' | 'none' | 'unknown' | 'error';
+
+/** Latest saved interview (from the staff dashboard database), if any. */
+async function latestInterview(discordId: string) {
+  const client = db();
+  if (!client) return undefined; // unknown — database not set up
+  const { data, error } = await client
+    .from(TABLE)
+    .select('status, note')
+    .eq('discord_id', discordId)
+    .eq('kind', 'interview')
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (error) return undefined;
+  return data as { status: string; note: string | null } | null;
+}
 
 /** Reads the applicant's Discord roles (same roles the interview form already uses). */
 async function getState(discordId: string): Promise<State> {
@@ -23,6 +40,9 @@ async function getState(discordId: string): Promise<State> {
     const roles: string[] = (await r.json()).roles ?? [];
     if (DISCORD_ROLE_WHITELIST && roles.includes(DISCORD_ROLE_WHITELIST)) return 'accepted';
     if (DISCORD_ROLE_REJECTED && roles.includes(DISCORD_ROLE_REJECTED)) return 'rejected';
+    const saved = await latestInterview(discordId);
+    if (saved === null) return 'none'; // database works and has no interview from this player
+    if (saved === undefined) return 'unknown'; // database not set up — can't tell applied from not applied
     return 'pending';
   } catch {
     return 'error';
@@ -41,7 +61,7 @@ export default async function StatusPage() {
     { en: 'Staff review', ar: 'مراجعة الإدارة' },
     { en: 'Decision', ar: 'القرار' },
   ];
-  const reached = !session ? 0 : state === 'pending' ? 2 : state === 'error' ? 1 : 4;
+  const reached = !session ? 0 : state === 'pending' ? 3 : state === 'unknown' ? 2 : state === 'none' || state === 'error' ? 1 : 4;
 
   const view = {
     accepted: {
@@ -59,10 +79,24 @@ export default async function StatusPage() {
     pending: {
       Icon: Clock,
       tone: 'text-amber-300 bg-amber-400/10 ring-amber-400/30',
+      title: isAr ? 'قيد المراجعة' : 'Under review',
+      body: isAr
+        ? 'مقابلتك قيد المراجعة من قبل الإدارة. ستصلك رسالة في الديسكورد عند اتخاذ القرار.'
+        : 'Your interview is being reviewed by staff. You’ll get a Discord message when there’s a decision.',
+    },
+    unknown: {
+      Icon: Clock,
+      tone: 'text-amber-300 bg-amber-400/10 ring-amber-400/30',
       title: isAr ? 'لا يوجد قرار بعد' : 'No decision yet',
       body: isAr
         ? 'إذا أرسلت المقابلة فهي قيد المراجعة. إذا لم ترسلها بعد، يمكنك التقديم الآن.'
         : 'If you sent the interview, it’s being reviewed. If you haven’t applied yet, you can do it now.',
+    },
+    none: {
+      Icon: FilePlus2,
+      tone: 'text-brand bg-brand/10 ring-brand/30',
+      title: isAr ? 'لم تقدّم بعد' : 'You haven’t applied yet',
+      body: isAr ? 'اجتز اختبار القوانين ثم املأ مقابلة الانضمام.' : 'Pass the rules quiz, then fill in the join interview.',
     },
     error: {
       Icon: Clock,
@@ -117,7 +151,7 @@ export default async function StatusPage() {
                   <h2 className="mt-5 text-2xl font-extrabold">{v.title}</h2>
                   <p className="mt-2 text-white/65">{v.body}</p>
                   <div className="mt-6 flex flex-wrap justify-center gap-3">
-                    {state === 'pending' && (
+                    {(state === 'none' || state === 'unknown') && (
                       <Link href="/apply" className="btn btn-primary">
                         {isAr ? 'قدّم الآن' : 'Apply now'}
                       </Link>

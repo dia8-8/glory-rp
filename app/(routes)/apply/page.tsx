@@ -2,10 +2,16 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { getLang, t } from '@/lib/i18n-server';
 import ApplyForm from '@/components/ApplyForm';
+import RulesQuiz from '@/components/RulesQuiz';
 import Link from 'next/link';
+import { cookies } from 'next/headers';
+import { hasPassed, PASS_COOKIE } from '@/lib/server/quiz';
+
+export const dynamic = 'force-dynamic';
 
 export default async function ApplyPage() {
   const session = await getServerSession(authOptions);
+  const quizPassed = !!session?.user?.id && hasPassed(cookies().get(PASS_COOKIE)?.value, session.user.id);
   const lang = getLang();
   const L = t(lang);
   const isAr = L.isAr;
@@ -64,10 +70,21 @@ export default async function ApplyPage() {
               : 'Answer the questions below to apply to join the server for an interview.'}
           </p>
         </div>
-        <ApplyForm
-          initialLang={lang}
-          discordName={discordName}
-        />
+        {/* Step 1: rules quiz. Step 2: the interview (only after passing). */}
+        <ol className="mx-auto mb-8 flex max-w-md items-center gap-3 text-sm">
+          <li className={`flex items-center gap-2 ${quizPassed ? 'text-white/50' : 'font-semibold text-brand'}`}>
+            <span className={`grid h-7 w-7 place-items-center rounded-full text-xs font-bold ${quizPassed ? 'bg-brand text-ink' : 'bg-brand/15 text-brand ring-1 ring-brand/40'}`}>
+              {quizPassed ? '✓' : '1'}
+            </span>
+            {isAr ? 'اختبار القوانين' : 'Rules quiz'}
+          </li>
+          <li className="h-px flex-1 bg-white/10" aria-hidden />
+          <li className={`flex items-center gap-2 ${quizPassed ? 'font-semibold text-brand' : 'text-white/40'}`}>
+            <span className={`grid h-7 w-7 place-items-center rounded-full text-xs font-bold ${quizPassed ? 'bg-brand/15 text-brand ring-1 ring-brand/40' : 'bg-white/5'}`}>2</span>
+            {isAr ? 'المقابلة' : 'Interview'}
+          </li>
+        </ol>
+        {quizPassed ? <ApplyForm initialLang={lang} discordName={discordName} /> : <RulesQuiz />}
       </section>
     </main>
   );

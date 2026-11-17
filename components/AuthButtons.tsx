@@ -2,7 +2,7 @@
 import { signIn, signOut, useSession } from 'next-auth/react';
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { ChevronDown, ClipboardCheck, LogOut, User as UserIcon } from 'lucide-react';
+import { ChevronDown, ClipboardCheck, LogOut, ShieldCheck, User as UserIcon } from 'lucide-react';
 import { tClient as T } from '@/lib/i18n-client';
 import { useLang } from '@/lib/providers';
 
@@ -20,6 +20,16 @@ export default function AuthButtons() {
     document.addEventListener('mousedown', close);
     return () => document.removeEventListener('mousedown', close);
   }, [open]);
+
+  // Show the dashboard link only to staff
+  const [staff, setStaff] = useState(false);
+  useEffect(() => {
+    if (status !== 'authenticated') return;
+    fetch('/api/admin/me')
+      .then((r) => (r.ok ? r.json() : { staff: false }))
+      .then((j) => setStaff(!!j.staff))
+      .catch(() => {});
+  }, [status]);
 
   const { lang } = useLang();
   const L = T(lang);
@@ -66,6 +76,17 @@ export default function AuthButtons() {
               <ClipboardCheck className="h-4 w-4 text-brand" />
               {isAr ? 'حالة طلبي' : 'My Application'}
             </Link>
+            {staff && (
+              <Link
+                href="/admin"
+                role="menuitem"
+                onClick={() => setOpen(false)}
+                className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm text-white/80 hover:bg-white/5 hover:text-white"
+              >
+                <ShieldCheck className="h-4 w-4 text-brand" />
+                {isAr ? 'لوحة الإدارة' : 'Staff Dashboard'}
+              </Link>
+            )}
             <button
               role="menuitem"
               onClick={async () => { setLoading('out'); await signOut({ callbackUrl: '/' }); }}
