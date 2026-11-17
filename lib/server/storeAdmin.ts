@@ -1,7 +1,7 @@
 // Helpers for the VIP store admin routes. Server only.
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { NextResponse } from 'next/server';
-import { getPackages, getWebstore, tebexConfigured, couponsConfigured, TebexError } from './tebex';
+import { getPackagesWithInfo, getWebstore, tebexConfigured, couponsConfigured, TebexError } from './tebex';
 import { loadStoreRows } from './store';
 
 export const STORE_BUCKET = 'store';
@@ -53,13 +53,15 @@ export async function adminSnapshot() {
     return NextResponse.json({ error: missing ? 'setup-needed' : rows.error ?? 'Error' }, { status: missing ? 503 : 500 });
   }
 
-  let packages: Awaited<ReturnType<typeof getPackages>> = [];
+  let packages: Awaited<ReturnType<typeof getPackagesWithInfo>>['packages'] = [];
+  let packageInfo: Awaited<ReturnType<typeof getPackagesWithInfo>>['info'] | null = null;
   let store: { name: string; currency: string; url?: string; usernames?: boolean } | null = null;
   let tebexError: string | null = null;
   if (tebexConfigured()) {
     try {
-      const [p, w] = await Promise.all([getPackages(), getWebstore()]);
-      packages = p;
+      const [p, w] = await Promise.all([getPackagesWithInfo(), getWebstore()]);
+      packages = p.packages;
+      packageInfo = p.info;
       store = { name: w.name, currency: w.currency, url: w.webstore_url, usernames: w.supports_usernames };
     } catch (e) {
       tebexError = e instanceof TebexError ? e.message : String(e);
@@ -73,6 +75,7 @@ export async function adminSnapshot() {
       coupons: couponsConfigured(),
       error: tebexError,
       store,
+      packageInfo,
       packages: packages.map((p) => ({ id: p.id, name: p.name, price: p.total_price, currency: p.currency, category: p.category?.name ?? '', image: p.image ?? null })),
     },
   });

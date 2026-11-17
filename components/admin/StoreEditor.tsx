@@ -26,7 +26,12 @@ type Sale = {
 type TebexPkg = { id: number; name: string; price: number; currency: string; category: string; image: string | null };
 type Snapshot = {
   products: Product[]; bundles: Bundle[]; sales: Sale[];
-  tebex: { configured: boolean; coupons: boolean; error: string | null; store: { name: string; currency: string; url?: string; usernames?: boolean } | null; packages: TebexPkg[] };
+  tebex: {
+    configured: boolean; coupons: boolean; error: string | null;
+    store: { name: string; currency: string; url?: string; usernames?: boolean } | null;
+    packageInfo: { fromPackages: number; fromCategories: number; categories: number } | null;
+    packages: TebexPkg[];
+  };
 };
 
 const CATEGORIES = [
@@ -80,7 +85,7 @@ export default function StoreEditor() {
   useEffect(() => {
     api<Snapshot>('/api/admin/store').then((r) => {
       apply(r);
-      if (r.ok && (!r.data.tebex.configured || r.data.tebex.error)) setSection('connection');
+      if (r.ok && (!r.data.tebex.configured || r.data.tebex.error || !r.data.tebex.packages.length)) setSection('connection');
     });
   }, []);
 
@@ -107,7 +112,7 @@ export default function StoreEditor() {
       <div className="mb-6 flex flex-wrap gap-2">
         {SECTIONS.map(({ key, en, ar, Icon }) => {
           const count = key === 'products' ? snap.products.length : key === 'bundles' ? snap.bundles.length : key === 'sales' ? snap.sales.length : null;
-          const warn = key === 'connection' && (!snap.tebex.configured || !!snap.tebex.error);
+          const warn = key === 'connection' && (!snap.tebex.configured || !!snap.tebex.error || !snap.tebex.packages.length);
           return (
             <button
               key={key}
@@ -242,7 +247,11 @@ function Products({ snap, isAr, pkgById, currency, apply }: Ctx) {
         </button>
       )}
       {!snap.tebex.packages.length && !form && (
-        <p className="mb-5 text-sm text-amber-300">{isAr ? 'اربط Tebex أولًا (تبويب ربط Tebex) لاختيار المنتجات.' : 'Connect Tebex first (Tebex connection tab) to pick products.'}</p>
+        <p className="mb-5 text-sm text-amber-300">
+          {snap.tebex.configured && !snap.tebex.error
+            ? isAr ? 'Tebex متصل لكن لم يُرجع أي منتج — راجع تبويب ربط Tebex.' : 'Tebex is connected but returned no packages — see the Tebex connection tab.'
+            : isAr ? 'اربط Tebex أولًا (تبويب ربط Tebex) لاختيار المنتجات.' : 'Connect Tebex first (Tebex connection tab) to pick products.'}
+        </p>
       )}
 
       {form && (
@@ -549,6 +558,30 @@ function Connection({ snap, isAr }: Ctx) {
             : <>{isAr ? 'أضف' : 'Add'} {code('TEBEX_PUBLIC_TOKEN')} — Tebex → Integrations → Headless API</>
           }
         />
+        {t.configured && !t.error && (
+          <Row
+            ok={t.packages.length > 0}
+            title={isAr ? 'المنتجات في Tebex' : 'Packages in Tebex'}
+            detail={
+              t.packages.length > 0 ? (
+                <>{t.packages.length} {isAr ? 'منتج متاح للاختيار' : 'packages available to add'}{t.packageInfo ? ` · ${t.packageInfo.categories} ${isAr ? 'أقسام' : 'categories'}` : ''}</>
+              ) : (
+                <>
+                  <span className="text-amber-300">{isAr ? 'Tebex لم يُرجع أي منتج.' : 'Tebex returned no packages.'}</span>
+                  {t.packageInfo && <span className="text-white/40"> ({t.packageInfo.categories} {isAr ? 'أقسام' : 'categories'})</span>}
+                  <ul className="mt-2 list-disc space-y-1 ps-5">
+                    <li>{isAr ? 'أنشئ المنتجات في لوحة Tebex وضعها داخل قسم (Category).' : 'Create the packages in the Tebex panel and put them inside a category.'}</li>
+                    <li>{isAr ? 'تأكد أن المنتجات غير مخفية/معطلة.' : 'Make sure the packages aren’t disabled or hidden.'}</li>
+                    <li>
+                      {isAr ? 'تأكد أن ' : 'Check that '}{code('TEBEX_PUBLIC_TOKEN')}
+                      {isAr ? ' هو مفتاح Headless العام لنفس المتجر (وليس المفتاح السري).' : ' is the Headless public token of this same store (not the secret key).'}
+                    </li>
+                  </ul>
+                </>
+              )
+            }
+          />
+        )}
         <Row
           ok={t.coupons}
           title={isAr ? 'الخصومات (للعروض والباقات)' : 'Discounts (sales & bundles)'}

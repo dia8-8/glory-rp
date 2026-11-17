@@ -78,10 +78,41 @@ export async function getWebstore(): Promise<TebexWebstore> {
   return j.data;
 }
 
-/** All packages with live prices (cached for 60 seconds). */
+type TebexCategory = { id: number; name: string; packages?: TebexPackage[]; subcategories?: TebexCategory[] };
+
+/** Every package found inside categories (some stores only return packages this way). */
+async function packagesFromCategories(): Promise<{ packages: TebexPackage[]; categories: number }> {
+  const j = await call<{ data: TebexCategory[] }>(`${base()}/categories?includePackages=1`, { revalidate: 60 });
+  const out: TebexPackage[] = [];
+  let categories = 0;
+  const walk = (cats: TebexCategory[] = []) => {
+    for (const c of cats) {
+      categories++;
+      for (const p of c.packages ?? []) out.push({ ...p, category: p.category ?? { id: c.id, name: c.name } });
+      walk(c.subcategories);
+    }
+  };
+  walk(j.data);
+  return { packages: out, categories };
+}
+
+/** All packages with live prices (cached for 60 seconds), plus counts for the connection panel. */
+export async function getPackagesWithInfo(): Promise<{ packages: TebexPackage[]; info: { fromPackages: number; fromCategories: number; categories: number } }> {
+  const [direct, viaCats] = await Promise.all([
+    call<{ data: TebexPackage[] }>(`${base()}/packages`, { revalidate: 60 }).then((j) => j.data ?? []),
+    packagesFromCategories().catch(() => ({ packages: [] as TebexPackage[], categories: 0 })),
+  ]);
+  // merge both lists, one entry per package id
+  const byId = new Map<number, TebexPackage>();
+  for (const p of [...direct, ...viaCats.packages]) if (p?.id !== undefined && !byId.has(p.id)) byId.set(p.id, p);
+  return {
+    packages: [...byId.values()],
+    info: { fromPackages: direct.length, fromCategories: viaCats.packages.length, categories: viaCats.categories },
+  };
+}
+
 export async function getPackages(): Promise<TebexPackage[]> {
-  const j = await call<{ data: TebexPackage[] }>(`${base()}/packages`, { revalidate: 60 });
-  return j.data ?? [];
+  return (await getPackagesWithInfo()).packages;
 }
 
 type Basket = { ident: string; links?: { checkout?: string; payment?: string }; packages?: unknown[]; total_price?: number };
