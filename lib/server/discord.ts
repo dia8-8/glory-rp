@@ -21,25 +21,39 @@ export async function getMemberRoles(discordId: string): Promise<string[] | null
  * Staff = anyone with a role listed in DISCORD_STAFF_ROLE_IDS (comma separated),
  * falling back to DISCORD_INTERVIEW_REVIEW_ROLE_ID (the role pinged for interviews).
  */
+const idList = (v?: string) => (v || '').split(',').map((s) => s.trim()).filter(Boolean);
+
 export function staffRoleIds(): string[] {
-  const list = (process.env.DISCORD_STAFF_ROLE_IDS || process.env.DISCORD_INTERVIEW_REVIEW_ROLE_ID || '')
-    .split(',')
-    .map((s) => s.trim())
-    .filter(Boolean);
-  return list;
+  return idList(process.env.DISCORD_STAFF_ROLE_IDS || process.env.DISCORD_INTERVIEW_REVIEW_ROLE_ID);
 }
 
-const staffCache = new Map<string, { ok: boolean; at: number }>();
+/** Admins = DISCORD_ADMIN_ROLE_IDS (comma separated). They manage site content and are also staff. */
+export function adminRoleIds(): string[] {
+  return idList(process.env.DISCORD_ADMIN_ROLE_IDS);
+}
+
+export type Access = { staff: boolean; admin: boolean };
+const accessCache = new Map<string, { access: Access; at: number }>();
+
+/** Looks up the member's roles once (cached 60s) and works out staff/admin access. */
+export async function getAccess(discordId?: string | null): Promise<Access> {
+  if (!discordId) return { staff: false, admin: false };
+  const hit = accessCache.get(discordId);
+  if (hit && Date.now() - hit.at < 60_000) return hit.access;
+  const roles = (await getMemberRoles(discordId)) ?? [];
+  const has = (ids: string[]) => ids.length > 0 && roles.some((r) => ids.includes(r));
+  const admin = has(adminRoleIds());
+  const access = { admin, staff: admin || has(staffRoleIds()) };
+  accessCache.set(discordId, { access, at: Date.now() });
+  return access;
+}
 
 export async function isStaff(discordId?: string | null): Promise<boolean> {
-  if (!discordId) return false;
-  const hit = staffCache.get(discordId);
-  if (hit && Date.now() - hit.at < 60_000) return hit.ok;
-  const roles = await getMemberRoles(discordId);
-  const ids = staffRoleIds();
-  const ok = !!roles && ids.length > 0 && roles.some((r) => ids.includes(r));
-  staffCache.set(discordId, { ok, at: Date.now() });
-  return ok;
+  return (await getAccess(discordId)).staff;
+}
+
+export async function isAdmin(discordId?: string | null): Promise<boolean> {
+  return (await getAccess(discordId)).admin;
 }
 
 export async function addRole(discordId: string, roleId?: string) {

@@ -5,6 +5,7 @@ import { authOptions } from '@/lib/auth';
 import { protectAndRecord } from '@/lib/server/submissions';
 import { cookies } from 'next/headers';
 import { hasPassed, PASS_COOKIE } from '@/lib/server/quiz';
+import { getInterviewFields } from '@/lib/server/content';
 
 function trim(s: unknown, n: number) {
   const x = String(s ?? '');
@@ -63,12 +64,18 @@ export async function POST(req: Request) {
   const webhook = process.env.DISCORD_INTERVIEW_WEBHOOK;
   if (!webhook) return NextResponse.json({ error: 'Missing DISCORD_INTERVIEW_WEBHOOK' }, { status: 500 });
 
-  const body = (await req.json().catch(() => ({}))) as Record<string, unknown>;
+  const raw = (await req.json().catch(() => ({}))) as Record<string, unknown>;
 
-  const required = ['age', 'experience', 'about', 'mic', 'rulesOk'];
-  const missing = required.filter(k => body[k] === undefined || body[k] === '' || body[k] === null);
+  // Questions set by admins (or the originals). Only their answers are kept.
+  const { fields: questions } = await getInterviewFields();
+  const body: Record<string, unknown> = { rulesOk: raw.rulesOk };
+  for (const q of questions) body[q.name] = typeof raw[q.name] === 'string' ? (raw[q.name] as string).trim().slice(0, 4000) : raw[q.name];
+
+  const missing = questions
+    .filter((q) => q.required !== false && (body[q.name] === undefined || body[q.name] === '' || body[q.name] === null))
+    .map((q) => q.labelEn);
   if (missing.length) return NextResponse.json({ error: `Missing: ${missing.join(', ')}` }, { status: 400 });
-  if (String(body.rulesOk) !== 'true' && body.rulesOk !== true) {
+  if (String(raw.rulesOk) !== 'true' && raw.rulesOk !== true) {
     return NextResponse.json({ error: 'You must accept the rules.' }, { status: 400 });
   }
 
@@ -93,32 +100,25 @@ export async function POST(req: Request) {
 
   const FIELD_VALUE_LIMIT = 1024;
 
-  const wrapInlineCode = (input: unknown) => {
-    const raw = String(input ?? '-').trim().replace(/```/g, "'''");
-    return '```' + raw.slice(0, FIELD_VALUE_LIMIT - 6) + '```';
+  const wrap = (input: unknown) => {
+    const text = String(input ?? '-').trim().replace(/```/g, "'''") || '-';
+    return '```' + text.slice(0, FIELD_VALUE_LIMIT - 6) + '```';
   };
 
-  const wrapCodeBlock = (input: unknown) => {
-    const raw = String(input ?? '-').trim().replace(/```/g, "'''");
-    return '```' + raw.slice(0, FIELD_VALUE_LIMIT - 6) + '```';
+  // One embed field per question, labelled with the English question; long answers take a full row
+  const shown = (q: (typeof questions)[number]) => {
+    const v = body[q.name];
+    if (q.type === 'select') return q.options.find((o) => o.value === v)?.labelEn ?? v;
+    return v;
   };
-
-  const { about, ...rest } = body as Record<string, unknown>;
-
-  const inlineFields = Object.entries(rest).map(([k, v]) => ({
-    name: trim(k, 256),
-    value: wrapInlineCode(v),
-    inline: true,
-  }));
-
   const fields = [
-    ...inlineFields.slice(0, 24),
-    ...(about ? [{ name: 'Story', value: wrapCodeBlock(about), inline: false }] : []),
+    ...questions.filter((q) => q.type !== 'textarea').map((q) => ({ name: trim(q.labelEn, 256), value: wrap(shown(q)), inline: true })),
+    ...questions.filter((q) => q.type === 'textarea').map((q) => ({ name: trim(q.labelEn, 256), value: wrap(shown(q)), inline: false })),
   ].slice(0, 25);
 
   const embed: any = {
     title: 'New Join Interview',
-    color: 0x6c2de4,
+    color: 0x50f018,
     timestamp: new Date().toISOString(),
     author: { name: trim(discordName, 256), ...(avatar ? { icon_url: avatar } : {}) },
     image: { url: `https://i.imgur.com/qnax1g2.png` },

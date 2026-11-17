@@ -86,7 +86,7 @@ export async function POST(req: Request, { params }: { params: { job: string } }
 
   const embed: any = {
     title: trim(`New ${job.titleEn} application`, 256),
-    color: 0x6c2de4,
+    color: 0x50f018,
     timestamp: new Date().toISOString(),
     fields,
     footer: { text: 'Glory RP | جلوري' },

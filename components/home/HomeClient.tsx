@@ -13,12 +13,12 @@ import Avatar from "@/components/Avatar";
 import JoinUsCta from "@/components/JoinUsCta";
 import LiveBadge from "@/components/LiveBadge";
 import { ServerStatusPill, ConnectButton } from "@/components/home/ServerStatus";
-import { SectionHeading, Features, Gallery, Faq, NewsPreview } from "@/components/home/Sections";
+import { SectionHeading, Features, Gallery, Faq, NewsPreview, type GalleryItem, type NewsItem } from "@/components/home/Sections";
 import { useLiveStreamers } from "@/lib/useLive";
 import { useStatus } from "@/lib/useStatus";
 import { SITE } from "@/lib/site";
 
-export default function HomePage() {
+export default function HomeClient({ gallery, news }: { gallery: GalleryItem[]; news: NewsItem[] }) {
   const { lang } = useLang();
   const L = t(lang);
   const { streamers: STREAMERS, live } = useLiveStreamers();
@@ -182,7 +182,7 @@ export default function HomePage() {
         </Reveal>
       </section>
 
-      <Gallery />
+      <Gallery items={gallery} />
 
       {/* ABOUT / RULES / CONTACT */}
       <section id="rules-home" className="relative mx-auto max-w-7xl scroll-mt-28 px-4 pb-28 pt-8">
@@ -217,7 +217,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <NewsPreview />
+      <NewsPreview items={news} />
       <Faq />
     </main>
   );

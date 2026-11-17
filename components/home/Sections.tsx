@@ -8,7 +8,10 @@ import {
 } from 'lucide-react';
 import { useLang } from '@/lib/providers';
 import Reveal from '@/components/Reveal';
-import { FEATURES, FAQ, GALLERY, NEWS, type Bi } from '@/data/home';
+import { FEATURES, FAQ, type Bi } from '@/data/home';
+
+export type GalleryItem = { src: string; caption: Bi };
+export type NewsItem = { date: string; tag: Bi; title: Bi; body: Bi };
 
 const ICONS = { drama: Drama, briefcase: Briefcase, store: Store, shield: Shield, radio: Radio, languages: Languages };
 
@@ -72,7 +75,7 @@ export function Features() {
 }
 
 /* ───────── Gallery + lightbox ───────── */
-export function Gallery() {
+export function Gallery({ items: GALLERY }: { items: GalleryItem[] }) {
   const { isAr, tr } = useBi();
   const [open, setOpen] = useState<number | null>(null);
   const n = GALLERY.length;
@@ -97,7 +100,7 @@ export function Gallery() {
   if (!n) return null;
 
   return (
-    <section className="relative mx-auto max-w-7xl px-4 py-24">
+    <section id="gallery" className="relative mx-auto max-w-7xl scroll-mt-24 px-4 py-24">
       <SectionHeading
         title={isAr ? 'من داخل المدينة' : 'Inside the City'}
         subtitle={isAr ? 'لقطات من عالم جلوري.' : 'A look at life in Glory RP.'}
@@ -105,7 +108,7 @@ export function Gallery() {
       <div className="mt-14 grid auto-rows-[180px] grid-cols-2 gap-3 md:auto-rows-[220px] md:grid-cols-4">
         {GALLERY.map((g, i) => (
           <Reveal
-            key={g.src}
+            key={g.src + i}
             delay={(i % 4) * 0.05}
             className={`h-full [&>div]:h-full ${i === 0 ? 'col-span-2 row-span-2' : ''} ${i === 3 ? 'md:col-span-2' : ''}`}
           >
@@ -118,6 +121,7 @@ export function Gallery() {
                 alt={tr(g.caption)}
                 fill
                 sizes="(min-width:768px) 50vw, 100vw"
+                unoptimized={g.src.startsWith('http')}
                 className="object-cover transition duration-700 group-hover:scale-110"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-ink/90 via-ink/10 to-transparent opacity-80 transition group-hover:opacity-100" />
@@ -164,7 +168,7 @@ export function Gallery() {
               className="relative h-[75vh] w-full max-w-5xl"
               onClick={(e) => e.stopPropagation()}
             >
-              <Image src={GALLERY[open].src} alt={tr(GALLERY[open].caption)} fill sizes="100vw" className="rounded-2xl object-contain" />
+              <Image src={GALLERY[open].src} alt={tr(GALLERY[open].caption)} fill sizes="100vw" unoptimized={GALLERY[open].src.startsWith('http')} className="rounded-2xl object-contain" />
               <figcaption className="absolute -bottom-10 inset-x-0 text-center text-sm text-white/70">
                 {tr(GALLERY[open].caption)} · <span dir="ltr">{open + 1} / {n}</span>
               </figcaption>
@@ -233,9 +237,9 @@ function formatDate(iso: string, isAr: boolean) {
   return `${d} ${(isAr ? MONTHS_AR : MONTHS_EN)[m - 1]} ${y}`;
 }
 
-export function NewsList({ limit }: { limit?: number }) {
+export function NewsList({ items: all, limit }: { items: NewsItem[]; limit?: number }) {
   const { isAr, tr } = useBi();
-  const items = limit ? NEWS.slice(0, limit) : NEWS;
+  const items = limit ? all.slice(0, limit) : all;
   if (!items.length) {
     return <p className="card p-8 text-center text-white/60">{isAr ? 'لا توجد أخبار بعد.' : 'No news yet.'}</p>;
   }
@@ -262,14 +266,14 @@ export function NewsList({ limit }: { limit?: number }) {
   );
 }
 
-export function NewsPreview() {
+export function NewsPreview({ items: NEWS }: { items: NewsItem[] }) {
   const { isAr } = useBi();
   if (!NEWS.length) return null;
   return (
     <section className="relative mx-auto max-w-3xl px-4 py-24">
       <SectionHeading eyebrow={<><Newspaper className="h-3.5 w-3.5" /> {isAr ? 'جديد' : 'Latest'}</>} title={isAr ? 'آخر الأخبار' : 'Latest Updates'} />
       <div className="mt-12">
-        <NewsList limit={3} />
+        <NewsList items={NEWS} limit={3} />
       </div>
       {NEWS.length > 3 && (
         <div className="mt-8 text-center">
