@@ -28,6 +28,7 @@ type Snapshot = {
   products: Product[]; bundles: Bundle[]; sales: Sale[];
   tebex: {
     configured: boolean; coupons: boolean; error: string | null;
+    serverKey: { ok: true; server: string } | { ok: false; error: string };
     store: { name: string; currency: string; url?: string; usernames?: boolean } | null;
     packageInfo: { fromPackages: number; fromCategories: number; categories: number } | null;
     packages: TebexPkg[];
@@ -40,6 +41,18 @@ const CATEGORIES = [
   { v: 'property', en: 'Property & Gangs', ar: 'عقار وعصابة' },
   { v: 'personal', en: 'Personal', ar: 'شخصي' },
 ];
+/** Maps a Tebex category name to one of the store tabs (null if it doesn't clearly match). */
+export function guessCategory(tebexCategory?: string | null): string | null {
+  const n = (tebexCategory || '').toLowerCase();
+  if (!n) return null;
+  // business first, so "Car Dealers" is a business, not a vehicle
+  if (/business|shop|store|dealer|company|مشار|محل|معرض|تجار/.test(n)) return 'business';
+  if (/vehic|car|bike|moto|boat|ride|مرك|سيار|دراج/.test(n)) return 'vehicle';
+  if (/propert|gang|villa|house|home|garage|real estate|عقار|عصاب|فل|كراج/.test(n)) return 'property';
+  if (/personal|character|plate|sim|phone|slot|شخص|لوح|رقم/.test(n)) return 'personal';
+  return null;
+}
+
 const SECTIONS = [
   { key: 'products', en: 'Products', ar: 'المنتجات', Icon: ShoppingBag },
   { key: 'bundles', en: 'Bundles', ar: 'الباقات', Icon: Package },
@@ -219,6 +232,21 @@ function Products({ snap, isAr, pkgById, currency, apply }: Ctx) {
   const [busy, setBusy] = useState(false);
   const set = (p: Partial<ProductForm>) => setForm((f) => (f ? { ...f, ...p } : f));
   const used = new Set(snap.products.map((p) => p.tebex_package_id));
+  // products whose website tab doesn't match their Tebex category
+  const mismatched = snap.products
+    .map((p) => ({ p, want: guessCategory(pkgById.get(p.tebex_package_id)?.category) }))
+    .filter((x) => x.want && x.want !== x.p.category);
+
+  async function matchTebexCategories() {
+    setBusy(true);
+    let last: Awaited<ReturnType<typeof send>> | null = null;
+    for (const { p, want } of mismatched) {
+      last = await send('/api/admin/store/products', 'PATCH', { ...p, category: want });
+      if (!last.ok) break;
+    }
+    setBusy(false);
+    if (last) apply(last, isAr ? 'تم ترتيب المنتجات حسب أقسام Tebex.' : 'Products now follow their Tebex categories.');
+  }
 
   async function save() {
     if (!form) return;
@@ -246,6 +274,11 @@ function Products({ snap, isAr, pkgById, currency, apply }: Ctx) {
           <Plus className="h-4 w-4" /> {isAr ? 'منتج جديد' : 'New product'}
         </button>
       )}
+      {!form && mismatched.length > 0 && (
+        <button onClick={matchTebexCategories} disabled={busy} className="btn btn-outline mb-5 ms-2">
+          {busy ? '…' : isAr ? `مطابقة أقسام Tebex (${mismatched.length})` : `Match Tebex categories (${mismatched.length})`}
+        </button>
+      )}
       {!snap.tebex.packages.length && !form && (
         <p className="mb-5 text-sm text-amber-300">
           {snap.tebex.configured && !snap.tebex.error
@@ -265,7 +298,13 @@ function Products({ snap, isAr, pkgById, currency, apply }: Ctx) {
                 value={form.tebex_package_id}
                 onChange={(e) => {
                   const pkg = pkgById.get(e.target.value);
-                  set({ tebex_package_id: e.target.value, ...(!form.name_en && pkg ? { name_en: pkg.name } : {}), ...(!form.image && !file && pkg?.image ? { image: pkg.image } : {}) });
+                  const cat = guessCategory(pkg?.category);
+                  set({
+                    tebex_package_id: e.target.value,
+                    ...(cat ? { category: cat } : {}),
+                    ...(!form.name_en && pkg ? { name_en: pkg.name } : {}),
+                    ...(!form.image && !file && pkg?.image ? { image: pkg.image } : {}),
+                  });
                 }}
               >
                 <option value="">{isAr ? '— اختر —' : '— choose —'}</option>
@@ -315,7 +354,14 @@ function Products({ snap, isAr, pkgById, currency, apply }: Ctx) {
                 <div className="min-w-0 flex-1">
                   <p className="truncate font-semibold">{isAr ? p.name_ar : p.name_en} {!p.visible && <EyeOff className="inline h-4 w-4 text-white/40" />}</p>
                   <p className="text-xs text-white/45">
-                    {pkg ? <span dir="ltr">{money(pkg.price, currency)} · Tebex #{p.tebex_package_id}</span> : (
+                    {pkg ? (
+                      <span>
+                        <span dir="ltr">{money(pkg.price, currency)}</span>
+                        {' · '}{isAr ? 'تبويب' : 'Tab'}: <b className="text-white/70">{(CATEGORIES.find((c) => c.v === p.category) ?? CATEGORIES[0])[isAr ? 'ar' : 'en']}</b>
+                        {pkg.category && <> · Tebex: {pkg.category}</>}
+                        {(() => { const w = guessCategory(pkg.category); return w && w !== p.category ? <span className="ms-1 text-amber-300">({isAr ? 'غير مطابق' : 'doesn’t match'})</span> : null; })()}
+                      </span>
+                    ) : (
                       <span className="text-amber-300"><AlertTriangle className="inline h-3.5 w-3.5" /> {isAr ? 'المنتج غير موجود في Tebex — مخفي من المتجر' : 'Package not found in Tebex — hidden from the store'}</span>
                     )}
                   </p>
@@ -585,7 +631,15 @@ function Connection({ snap, isAr }: Ctx) {
         <Row
           ok={t.coupons}
           title={isAr ? 'الخصومات (للعروض والباقات)' : 'Discounts (sales & bundles)'}
-          detail={t.coupons ? (isAr ? 'المفتاح موجود — يمكن إنشاء خصومات.' : 'Key set — discounts can be created.') : <>{isAr ? 'أضف' : 'Add'} {code('TEBEX_PRIVATE_KEY')} — Tebex → Game servers → {isAr ? 'المفتاح السري' : 'secret key'}</>}
+          detail={
+            t.serverKey.ok ? (
+              <>{isAr ? 'المفتاح صحيح — مرتبط بالسيرفر' : 'Key works — linked to game server'} <b className="text-white">{t.serverKey.server}</b>. {isAr ? 'يمكن إنشاء خصومات.' : 'Discounts can be created.'}</>
+            ) : t.serverKey.error === 'missing' ? (
+              <>{isAr ? 'أضف' : 'Add'} {code('TEBEX_PRIVATE_KEY')} — Tebex → Game Servers → {isAr ? 'سيرفر FiveM ← المفتاح السري' : 'your FiveM server → Secret Key'}</>
+            ) : (
+              <span className="text-red-300">{t.serverKey.error}</span>
+            )
+          }
         />
         {t.store && (
           <Row

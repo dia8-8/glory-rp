@@ -205,6 +205,36 @@ function pluginHeaders() {
   return { 'X-Tebex-Secret': key };
 }
 
+/**
+ * Checks TEBEX_PRIVATE_KEY with Tebex (Plugin API "information"): returns the game server it belongs to,
+ * or the reason it's rejected. Used by the admin connection panel.
+ */
+export async function checkServerKey(): Promise<{ ok: true; server: string } | { ok: false; error: string }> {
+  if (!process.env.TEBEX_PRIVATE_KEY) return { ok: false, error: 'missing' };
+  try {
+    const j = await call<{ server?: { name?: string; id?: number } }>(`${PLUGIN}/information`, { headers: pluginHeaders(), revalidate: 300 });
+    return { ok: true, server: j?.server?.name || `#${j?.server?.id ?? '?'}` };
+  } catch (e) {
+    try {
+      explainPluginError(e);
+    } catch (x) {
+      return { ok: false, error: (x as Error).message };
+    }
+    return { ok: false, error: String(e) };
+  }
+}
+
+/** Turns Tebex's "wrong key" reply into an instruction the admin can act on. */
+function explainPluginError(e: unknown): never {
+  if (e instanceof TebexError && e.status === 403 && /No server could be found/i.test(e.message)) {
+    throw new TebexError(
+      'TEBEX_PRIVATE_KEY is not a game server secret key. Use the key from Tebex → Game Servers → your FiveM server (the same one as sv_tebexSecret), then redeploy.',
+      403
+    );
+  }
+  throw e;
+}
+
 const ymd = (d: Date) => d.toISOString().slice(0, 10);
 
 /** Creates a percentage coupon limited to the given packages. Returns { id, code }. */
@@ -236,7 +266,7 @@ export async function createCoupon(opts: {
       discount_application_method: 0,
       note: opts.note,
     }),
-  });
+  }).catch(explainPluginError);
   return { id: String(j.data.id), code: j.data.code ?? opts.code };
 }
 

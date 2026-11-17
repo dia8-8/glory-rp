@@ -1,7 +1,7 @@
 // Helpers for the VIP store admin routes. Server only.
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { NextResponse } from 'next/server';
-import { getPackagesWithInfo, getWebstore, tebexConfigured, couponsConfigured, TebexError } from './tebex';
+import { checkServerKey, getPackagesWithInfo, getWebstore, tebexConfigured, couponsConfigured, TebexError } from './tebex';
 import { loadStoreRows } from './store';
 
 export const STORE_BUCKET = 'store';
@@ -68,11 +68,14 @@ export async function adminSnapshot() {
     }
   }
 
+  const serverKey = await checkServerKey();
+
   return NextResponse.json({
     ...rows,
     tebex: {
       configured: tebexConfigured(),
-      coupons: couponsConfigured(),
+      coupons: couponsConfigured() && serverKey.ok,
+      serverKey,
       error: tebexError,
       store,
       packageInfo,
