@@ -2,7 +2,7 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 
 export type SubmissionKind = 'interview' | 'job' | 'cityhall' | 'ticket';
-export type SubmissionStatus = 'pending' | 'accepted' | 'rejected' | 'closed';
+export type SubmissionStatus = 'pending' | 'accepted' | 'rejected' | 'under18' | 'closed';
 
 export type Submission = {
   id: string;

@@ -2,14 +2,14 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import clsx from 'clsx';
 import {
-  Check, X, Archive, RotateCcw, Search, RefreshCw, Inbox, ExternalLink, Database, Copy, ShieldCheck,
+  Check, X, Archive, RotateCcw, Baby, Search, RefreshCw, Inbox, ExternalLink, Database, Copy, ShieldCheck,
 } from 'lucide-react';
 import { useLang } from '@/lib/providers';
 
 type Bi = { en: string; ar: string };
 export type Labels = { fields: Record<string, Bi>; categories: Record<string, Bi> };
 
-type Status = 'pending' | 'accepted' | 'rejected' | 'closed';
+type Status = 'pending' | 'accepted' | 'rejected' | 'under18' | 'closed';
 type Kind = 'interview' | 'job' | 'cityhall' | 'ticket';
 type Item = {
   id: string;
@@ -30,6 +30,7 @@ const STATUS_TABS: { key: Status | 'all'; en: string; ar: string }[] = [
   { key: 'pending', en: 'Pending', ar: 'قيد المراجعة' },
   { key: 'accepted', en: 'Accepted', ar: 'مقبول' },
   { key: 'rejected', en: 'Rejected', ar: 'مرفوض' },
+  { key: 'under18', en: 'Under 18', ar: 'أقل من 18' },
   { key: 'closed', en: 'Closed', ar: 'مغلق' },
   { key: 'all', en: 'All', ar: 'الكل' },
 ];
@@ -44,6 +45,7 @@ const STATUS_STYLE: Record<Status, string> = {
   pending: 'bg-amber-400/10 text-amber-300 ring-amber-400/30',
   accepted: 'bg-brand/10 text-brand ring-brand/30',
   rejected: 'bg-red-400/10 text-red-300 ring-red-400/30',
+  under18: 'bg-orange-400/10 text-orange-300 ring-orange-400/30',
   closed: 'bg-white/5 text-white/60 ring-white/15',
 };
 
@@ -267,7 +269,10 @@ function Detail({
   const tr = (b?: Bi, f = '') => (b ? (isAr ? b.ar : b.en) : f);
 
   async function act(status: Status) {
-    if (status === 'rejected' && item.kind === 'interview' && !confirm(isAr ? 'رفض المقابلة سيعطي اللاعب رتبة المرفوض. متابعة؟' : 'Rejecting gives the player the Rejected role. Continue?')) return;
+    if (
+      status === 'under18' &&
+      !confirm(isAr ? 'سيحصل اللاعب على رتبة أقل من 18 وتُزال رتبة الضيف، ولن يستطيع التقديم مجددًا. متابعة؟' : 'The player gets the Under 18 role, loses the Guest role and can’t apply again. Continue?')
+    ) return;
     setBusy(status);
     setMsg(null);
     const r = await fetch(`/api/admin/submissions/${item.id}`, {
@@ -281,7 +286,8 @@ function Detail({
     onUpdated(j.item);
     const parts = [isAr ? 'تم الحفظ' : 'Saved'];
     if (j.roles === true) parts.push(isAr ? 'تم تحديث الرتب' : 'roles updated');
-    if (j.roles === false) parts.push(isAr ? '⚠️ فشل تحديث الرتب (تحقق من صلاحيات البوت)' : '⚠️ role update failed (check bot permissions)');
+    if (j.missingEnv?.length) parts.push((isAr ? '⚠️ إعداد ناقص: ' : '⚠️ missing setting: ') + j.missingEnv.join(', '));
+    else if (j.roles === false) parts.push(isAr ? '⚠️ فشل تحديث الرتب (تحقق من صلاحيات البوت)' : '⚠️ role update failed (check bot permissions)');
     if (j.dm === true) parts.push(isAr ? 'تم إرسال رسالة خاصة' : 'DM sent');
     if (j.dm === false) parts.push(isAr ? '⚠️ تعذر إرسال رسالة (الخاص مغلق)' : '⚠️ DM failed (player has DMs closed)');
     setMsg({ ok: j.roles !== false, text: parts.join(' · ') });
@@ -360,6 +366,15 @@ function Detail({
               >
                 <X className="h-4 w-4" /> {busy === 'rejected' ? '…' : isAr ? 'رفض' : 'Reject'}
               </button>
+              {item.kind === 'interview' && (
+                <button
+                  onClick={() => act('under18')}
+                  disabled={!!busy}
+                  className="btn border border-orange-400/40 bg-orange-400/10 text-orange-300 hover:bg-orange-400/20"
+                >
+                  <Baby className="h-4 w-4" /> {busy === 'under18' ? '…' : isAr ? 'أقل من 18' : 'Under 18'}
+                </button>
+              )}
             </>
           ) : (
             <button onClick={() => act('closed')} disabled={!!busy} className="btn btn-primary">
@@ -375,8 +390,8 @@ function Detail({
         {item.kind === 'interview' && (
           <p className="mt-3 text-xs text-white/40">
             {isAr
-              ? 'القبول يعطي رتبة Whitelist ويزيل رتبة المرفوض. الرفض يعطي رتبة المرفوض.'
-              : 'Accept gives the Whitelist role and removes Rejected. Reject gives the Rejected role.'}
+              ? 'قبول: يعطي رتبة Whitelist ويزيل رتبة الضيف. أقل من 18: يعطي رتبة Under 18 ويزيل رتبة الضيف. رفض: بدون تغيير رتب، ويمكنه التقديم لاحقًا.'
+              : 'Accept: adds Whitelist, removes Guest. Under 18: adds Under 18, removes Guest. Reject: no role change — they can apply again later.'}
           </p>
         )}
         {msg && <p className={clsx('mt-3 text-sm', msg.ok ? 'text-brand' : 'text-amber-300')}>{msg.text}</p>}

@@ -9,7 +9,7 @@ create table if not exists public.submissions (
   discord_name  text not null default '',
   avatar        text,
   answers       jsonb not null default '{}'::jsonb,
-  status        text not null default 'pending' check (status in ('pending', 'accepted', 'rejected', 'closed')),
+  status        text not null default 'pending' check (status in ('pending', 'accepted', 'rejected', 'under18', 'closed')),
   note          text,                                -- staff note / reason sent to the player
   reviewed_by   text,
   reviewed_at   timestamptz,

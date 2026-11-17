@@ -6,7 +6,7 @@ import { isStaff } from '@/lib/server/discord';
 
 export const dynamic = 'force-dynamic';
 
-const STATUSES = ['pending', 'accepted', 'rejected', 'closed'];
+const STATUSES = ['pending', 'accepted', 'rejected', 'under18', 'closed'];
 const KINDS = ['interview', 'job', 'cityhall', 'ticket'];
 
 /** GET ?status=pending&kind=interview&q=name → newest first, max 100 (staff only) */

@@ -45,16 +45,17 @@ export async function POST(req: Request) {
 
   const userRoles: string[] = member.roles || [];
 
-  const blockedRoles = [
-    process.env.DISCORD_ROLE_WHITELIST,
-    process.env.DISCORD_ROLE_REJECTED,
-  ].filter(Boolean);
-
-  const hasBlockedRole = userRoles.some(role => blockedRoles.includes(role));
-
-  if (hasBlockedRole) {
+  // Already whitelisted, or marked under 18 → can't apply
+  const { DISCORD_ROLE_WHITELIST, DISCORD_ROLE_UNDER18 } = process.env;
+  if (DISCORD_ROLE_WHITELIST && userRoles.includes(DISCORD_ROLE_WHITELIST)) {
     return NextResponse.json(
-      { error: 'You already applied or are not eligible to apply again.' },
+      { error: 'You are already whitelisted. / أنت مقبول بالفعل في السيرفر.' },
+      { status: 403 }
+    );
+  }
+  if (DISCORD_ROLE_UNDER18 && userRoles.includes(DISCORD_ROLE_UNDER18)) {
+    return NextResponse.json(
+      { error: 'You must be 18 or older to join. / يجب أن يكون عمرك 18 سنة أو أكثر للانضمام.' },
       { status: 403 }
     );
   }

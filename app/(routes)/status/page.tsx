@@ -3,13 +3,13 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { getLang } from '@/lib/i18n-server';
 import { BRAND } from '@/lib/brand';
-import { CheckCircle2, XCircle, Clock, LogIn, ArrowUpRight, FilePlus2 } from 'lucide-react';
+import { CheckCircle2, XCircle, Clock, LogIn, ArrowUpRight, FilePlus2, Baby } from 'lucide-react';
 import { db, TABLE } from '@/lib/server/db';
 
 export const dynamic = 'force-dynamic';
 export const metadata = { title: 'My Application' };
 
-type State = 'accepted' | 'rejected' | 'pending' | 'none' | 'unknown' | 'error';
+type State = 'accepted' | 'rejected' | 'under18' | 'pending' | 'none' | 'unknown' | 'error';
 
 /** Latest saved interview (from the staff dashboard database), if any. */
 async function latestInterview(discordId: string) {
@@ -29,7 +29,7 @@ async function latestInterview(discordId: string) {
 
 /** Reads the applicant's Discord roles (same roles the interview form already uses). */
 async function getState(discordId: string): Promise<State> {
-  const { DISCORD_GUILD_ID, DISCORD_BOT_TOKEN, DISCORD_ROLE_WHITELIST, DISCORD_ROLE_REJECTED } = process.env;
+  const { DISCORD_GUILD_ID, DISCORD_BOT_TOKEN, DISCORD_ROLE_WHITELIST, DISCORD_ROLE_UNDER18 } = process.env;
   if (!DISCORD_GUILD_ID || !DISCORD_BOT_TOKEN) return 'error';
   try {
     const r = await fetch(`https://discord.com/api/v10/guilds/${DISCORD_GUILD_ID}/members/${discordId}`, {
@@ -39,10 +39,13 @@ async function getState(discordId: string): Promise<State> {
     if (!r.ok) return 'error';
     const roles: string[] = (await r.json()).roles ?? [];
     if (DISCORD_ROLE_WHITELIST && roles.includes(DISCORD_ROLE_WHITELIST)) return 'accepted';
-    if (DISCORD_ROLE_REJECTED && roles.includes(DISCORD_ROLE_REJECTED)) return 'rejected';
+    if (DISCORD_ROLE_UNDER18 && roles.includes(DISCORD_ROLE_UNDER18)) return 'under18';
     const saved = await latestInterview(discordId);
     if (saved === null) return 'none'; // database works and has no interview from this player
     if (saved === undefined) return 'unknown'; // database not set up — can't tell applied from not applied
+    if (saved.status === 'rejected') return 'rejected'; // plain reject: no role, may apply again
+    if (saved.status === 'under18') return 'under18';
+    if (saved.status === 'accepted') return 'accepted';
     return 'pending';
   } catch {
     return 'error';
@@ -74,7 +77,17 @@ export default async function StatusPage() {
       Icon: XCircle,
       tone: 'text-red-300 bg-red-400/10 ring-red-400/30',
       title: isAr ? 'لم يتم قبول طلبك' : 'Your application wasn’t accepted',
-      body: isAr ? 'للاستفسار، افتح تذكرة في الديسكورد.' : 'If you have questions, open a ticket on Discord.',
+      body: isAr
+        ? 'يمكنك التقديم مرة أخرى بعد 24 ساعة من آخر تقديم. للاستفسار، افتح تذكرة في الديسكورد.'
+        : 'You can apply again 24 hours after your last application. For questions, open a ticket on Discord.',
+    },
+    under18: {
+      Icon: Baby,
+      tone: 'text-orange-300 bg-orange-400/10 ring-orange-400/30',
+      title: isAr ? 'يجب أن يكون عمرك 18+' : 'You must be 18 or older',
+      body: isAr
+        ? 'السيرفر للاعبين بعمر 18 سنة فأكثر. يمكنك التقديم عند بلوغك 18 — افتح تذكرة في الديسكورد حينها.'
+        : 'The server is for players aged 18+. When you turn 18, open a ticket on Discord to apply.',
     },
     pending: {
       Icon: Clock,
@@ -151,7 +164,7 @@ export default async function StatusPage() {
                   <h2 className="mt-5 text-2xl font-extrabold">{v.title}</h2>
                   <p className="mt-2 text-white/65">{v.body}</p>
                   <div className="mt-6 flex flex-wrap justify-center gap-3">
-                    {(state === 'none' || state === 'unknown') && (
+                    {(state === 'none' || state === 'unknown' || state === 'rejected') && (
                       <Link href="/apply" className="btn btn-primary">
                         {isAr ? 'قدّم الآن' : 'Apply now'}
                       </Link>

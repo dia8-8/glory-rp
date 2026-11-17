@@ -7,12 +7,16 @@ import { JOBS } from '@/lib/jobs';
 
 export const dynamic = 'force-dynamic';
 
-const ALLOWED: SubmissionStatus[] = ['pending', 'accepted', 'rejected', 'closed'];
+const ALLOWED: SubmissionStatus[] = ['pending', 'accepted', 'rejected', 'under18', 'closed'];
 
 function dmText(s: Submission, status: SubmissionStatus, note?: string) {
   const reason = note ? `\n\n📝 ${note}` : '';
   const site = process.env.NEXT_PUBLIC_SITE_URL ? `\n${process.env.NEXT_PUBLIC_SITE_URL}/status` : '';
   if (s.kind === 'interview') {
+    if (status === 'under18') {
+      return `🔞 **Glory RP** — You must be **18 or older** to join the server. You can apply again once you turn 18.
+🔞 يجب أن يكون عمرك **18 سنة أو أكثر** للانضمام للسيرفر. يمكنك التقديم مجددًا عند بلوغك 18.${reason}`;
+    }
     return status === 'accepted'
       ? `✅ **Glory RP** — Your join interview was **accepted**! Welcome to the city.\n✅ تم **قبول** مقابلة الانضمام الخاصة بك! مرحبًا بك في جلوري.${reason}${site}`
       : `❌ **Glory RP** — Your join interview was **not accepted**.\n❌ لم يتم قبول مقابلة الانضمام الخاصة بك.${reason}`;
@@ -59,15 +63,21 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
     .single();
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
-  // Discord side effects
-  const result = { roles: null as null | boolean, dm: null as null | boolean };
-  if (sub.kind === 'interview' && (status === 'accepted' || status === 'rejected')) {
-    const whitelist = process.env.DISCORD_ROLE_WHITELIST;
-    const rejected = process.env.DISCORD_ROLE_REJECTED;
-    result.roles =
-      status === 'accepted'
-        ? (await addRole(sub.discord_id, whitelist)) && (await removeRole(sub.discord_id, rejected).then(() => true))
-        : await addRole(sub.discord_id, rejected);
+  // Discord roles for interviews:
+  //   accepted → add Whitelist, remove Guest
+  //   under18  → add Under18,   remove Guest
+  //   rejected → no role change (the player may apply again later)
+  const result = { roles: null as null | boolean, dm: null as null | boolean, missingEnv: [] as string[] };
+  if (sub.kind === 'interview' && (status === 'accepted' || status === 'under18')) {
+    const addEnv = status === 'accepted' ? 'DISCORD_ROLE_WHITELIST' : 'DISCORD_ROLE_UNDER18';
+    const addId = process.env[addEnv];
+    const guestId = process.env.DISCORD_ROLE_GUEST;
+    if (!addId) result.missingEnv.push(addEnv);
+    if (!guestId) result.missingEnv.push('DISCORD_ROLE_GUEST');
+    const added = addId ? await addRole(sub.discord_id, addId) : false;
+    // removing a role the member doesn't have still succeeds on Discord's side
+    const removed = guestId ? await removeRole(sub.discord_id, guestId) : false;
+    result.roles = added && removed;
   }
   if (notify && status !== 'pending') result.dm = await sendDM(sub.discord_id, dmText(sub, status, note));
 
