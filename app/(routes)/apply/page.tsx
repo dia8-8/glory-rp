@@ -6,7 +6,7 @@ import RulesQuiz from '@/components/RulesQuiz';
 import Link from 'next/link';
 import { cookies } from 'next/headers';
 import { hasPassed, PASS_COOKIE } from '@/lib/server/quiz';
-import { getInterviewFields } from '@/lib/server/content';
+import { DEFAULT_INTERVIEW_FIELDS } from '@/lib/interview';
 
 export const dynamic = 'force-dynamic';
 
@@ -85,7 +85,7 @@ export default async function ApplyPage() {
             {isAr ? 'المقابلة' : 'Interview'}
           </li>
         </ol>
-        {quizPassed ? <ApplyForm discordName={discordName} fields={(await getInterviewFields()).fields} /> : <RulesQuiz />}
+        {quizPassed ? <ApplyForm discordName={discordName} fields={DEFAULT_INTERVIEW_FIELDS} /> : <RulesQuiz />}
       </section>
     </main>
   );

@@ -1,9 +1,8 @@
 // Admin-managed content with safe fallbacks. Server only.
 //   • Database set up → it is the source of truth (an empty table means "nothing to show").
-//   • Database not set up / table missing → the built-in content from data/home.ts and lib/interview.ts.
+//   • Database not set up / table missing → the built-in content from data/home.ts.
 import { db } from './db';
 import { GALLERY, NEWS } from '@/data/home';
-import { DEFAULT_INTERVIEW_FIELDS, type InterviewField } from '@/lib/interview';
 
 type Bi = { en: string; ar: string };
 export type GalleryItem = { id?: string; src: string; path?: string | null; caption: Bi; position?: number };
@@ -48,13 +47,4 @@ export async function getNews(limit?: number): Promise<{ items: NewsItem[]; sour
     }
   }
   return { source: 'default', items: limit ? NEWS.slice(0, limit) : NEWS };
-}
-
-export async function getInterviewFields(): Promise<{ fields: InterviewField[]; source: ContentSource }> {
-  const client = db();
-  if (client) {
-    const { data, error } = await client.from('site_settings').select('value').eq('key', 'interview_fields').maybeSingle();
-    if (!error && Array.isArray(data?.value) && data.value.length) return { fields: data.value as InterviewField[], source: 'database' };
-  }
-  return { fields: DEFAULT_INTERVIEW_FIELDS, source: 'default' };
 }

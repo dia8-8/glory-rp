@@ -1,19 +1,20 @@
-// Rules quiz — server only. Correct answers never leave the server.
-// Every question is taken from the rules page; edit freely (keep `answer` = index of the correct option).
-import { createHmac, timingSafeEqual } from 'node:crypto';
+// Rules quiz — server only. Correct answers never leave the server (except to admins editing the quiz).
+// Admins edit the questions at /admin/quiz; the list below is the built-in default used until they save.
+import { createHmac, timingSafeEqual, randomBytes } from 'node:crypto';
+import { db } from './db';
 
 type Bi = { en: string; ar: string };
-type Question = { id: string; q: Bi; options: Bi[]; answer: number };
+export type QuizQuestion = { id: string; q: Bi; options: Bi[]; answer: number };
+export type QuizConfig = { questions: QuizQuestion[]; size: number; passMark: number };
+type Question = QuizQuestion;
 
-export const QUIZ_SIZE = 10;
-export const PASS_MARK = 8; // out of QUIZ_SIZE
 export const RETRY_WAIT_MS = 2 * 60_000;
 const PASS_VALID_MS = 7 * 24 * 3600_000;
 
 export const PASS_COOKIE = 'glory_quiz';
 export const WAIT_COOKIE = 'glory_quiz_wait';
 
-const QUESTIONS: Question[] = [
+const DEFAULT_QUESTIONS: Question[] = [
   {
     id: 'rdm',
     q: { en: 'What is RDM (Random Deathmatch)?', ar: 'ما هو الـ RDM؟' },
@@ -195,31 +196,86 @@ const QUESTIONS: Question[] = [
   },
 ];
 
+/** Built-in quiz: every question above, 10 asked per attempt, 8 needed to pass. */
+export const DEFAULT_QUIZ: QuizConfig = { questions: DEFAULT_QUESTIONS, size: 10, passMark: 8 };
+
+/* ───────── Loading & saving (admin-edited quiz lives in site_settings, key 'quiz') ───────── */
+
+export async function getQuiz(): Promise<{ config: QuizConfig; source: 'database' | 'default' }> {
+  const client = db();
+  if (client) {
+    const { data, error } = await client.from('site_settings').select('value').eq('key', 'quiz').maybeSingle();
+    if (!error && data?.value) {
+      const v = validateQuiz(data.value);
+      if ('config' in v) return { config: v.config, source: 'database' };
+    }
+  }
+  return { config: DEFAULT_QUIZ, source: 'default' };
+}
+
+const text = (v: unknown, max: number) => (typeof v === 'string' ? v.trim().slice(0, max) : '');
+
+/** Cleans what an admin sends. Returns a safe config or a readable error. */
+export function validateQuiz(input: unknown): { config: QuizConfig } | { error: string } {
+  const raw = (input ?? {}) as Record<string, unknown>;
+  const list = Array.isArray(raw.questions) ? raw.questions : null;
+  if (!list || list.length === 0) return { error: 'Add at least one question.' };
+  if (list.length > 100) return { error: 'Maximum 100 questions.' };
+
+  const ids = new Set<string>();
+  const questions: QuizQuestion[] = [];
+  for (const [i, item] of list.entries()) {
+    const r = (item ?? {}) as Record<string, any>;
+    const n = i + 1;
+    const q = { en: text(r.q?.en, 300), ar: text(r.q?.ar, 300) };
+    if (!q.en || !q.ar) return { error: `Question ${n}: write it in English and Arabic.` };
+    const options = (Array.isArray(r.options) ? r.options : []).map((o: any) => ({ en: text(o?.en, 200), ar: text(o?.ar, 200) }));
+    if (options.length < 2 || options.length > 6) return { error: `Question ${n}: needs 2 to 6 answers.` };
+    if (options.some((o: Bi) => !o.en || !o.ar)) return { error: `Question ${n}: every answer needs English and Arabic text.` };
+    const answer = Number(r.answer);
+    if (!Number.isInteger(answer) || answer < 0 || answer >= options.length) return { error: `Question ${n}: mark the correct answer.` };
+    let id = text(r.id, 40).replace(/[^a-zA-Z0-9_-]/g, '');
+    if (!id || ids.has(id)) id = 'q_' + randomBytes(4).toString('hex');
+    ids.add(id);
+    questions.push({ id, q, options, answer });
+  }
+
+  const size = Number(raw.size);
+  const passMark = Number(raw.passMark);
+  if (!Number.isInteger(size) || size < 1 || size > Math.min(30, questions.length))
+    return { error: `Questions per attempt must be between 1 and ${Math.min(30, questions.length)}.` };
+  if (!Number.isInteger(passMark) || passMark < 1 || passMark > size)
+    return { error: `Correct answers needed must be between 1 and ${size}.` };
+  return { config: { questions, size, passMark } };
+}
+
 /* ───────── Question selection ───────── */
 
 export type PublicQuestion = { id: string; q: Bi; options: Bi[] };
 
-export function drawQuestions(): PublicQuestion[] {
-  const pool = [...QUESTIONS];
+/** A random set of `size` questions, without the answers. */
+export function drawQuestions(config: QuizConfig): PublicQuestion[] {
+  const pool = [...config.questions];
   for (let i = pool.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [pool[i], pool[j]] = [pool[j], pool[i]];
   }
-  return pool.slice(0, QUIZ_SIZE).map(({ id, q, options }) => ({ id, q, options }));
+  return pool.slice(0, config.size).map(({ id, q, options }) => ({ id, q, options }));
 }
 
-/** answers: { [questionId]: chosenIndex }. Only ids that were really asked should be sent. */
-export function grade(answers: Record<string, number>) {
+/** answers: { [questionId]: chosenIndex }. Must answer exactly `size` real questions. */
+export function grade(answers: Record<string, number>, config: QuizConfig) {
   const ids = Object.keys(answers);
-  if (ids.length !== QUIZ_SIZE) return { score: 0, total: QUIZ_SIZE, passed: false, wrong: [] as string[] };
+  const total = config.size;
+  if (ids.length !== total) return { score: 0, total, passed: false, wrong: [] as string[] };
   let score = 0;
   const wrong: string[] = [];
   for (const id of ids) {
-    const q = QUESTIONS.find((x) => x.id === id);
+    const q = config.questions.find((x) => x.id === id);
     if (q && Number(answers[id]) === q.answer) score++;
     else wrong.push(id);
   }
-  return { score, total: QUIZ_SIZE, passed: score >= PASS_MARK, wrong };
+  return { score, total, passed: score >= config.passMark, wrong };
 }
 
 /* ───────── Signed cookies (HMAC with NEXTAUTH_SECRET) ───────── */

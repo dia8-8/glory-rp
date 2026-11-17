@@ -1,5 +1,4 @@
 import { db } from '@/lib/server/db';
-import { getInterviewFields } from '@/lib/server/content';
 import { DEFAULT_INTERVIEW_FIELDS } from '@/lib/interview';
 import { JOBS } from '@/lib/jobs';
 import { TICKETS } from '@/lib/tickets';
@@ -15,8 +14,6 @@ async function buildLabels(): Promise<Labels> {
   const addFields = (list: any[]) => {
     for (const f of list ?? []) fields[f.name] ??= { en: f.labelEn ?? f.name, ar: f.labelAr ?? f.name };
   };
-  // current interview questions first, then the originals (for older submissions)
-  addFields((await getInterviewFields()).fields);
   addFields(DEFAULT_INTERVIEW_FIELDS);
   for (const src of [JOBS, TICKETS, CITYHALL] as Record<string, any>[]) {
     for (const [k, v] of Object.entries(src)) {

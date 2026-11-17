@@ -3,8 +3,8 @@ import { cookies } from 'next/headers';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import {
-  drawQuestions, grade, hasPassed, passToken, waitToken, waitLeft,
-  PASS_COOKIE, WAIT_COOKIE, PASS_MARK, QUIZ_SIZE,
+  drawQuestions, grade, hasPassed, passToken, waitToken, waitLeft, getQuiz,
+  PASS_COOKIE, WAIT_COOKIE,
 } from '@/lib/server/quiz';
 
 export const dynamic = 'force-dynamic';
@@ -20,7 +20,8 @@ export async function GET() {
   const jar = cookies();
   if (hasPassed(jar.get(PASS_COOKIE)?.value, id)) return NextResponse.json({ passed: true });
   const wait = waitLeft(jar.get(WAIT_COOKIE)?.value, id);
-  return NextResponse.json({ passed: false, waitMs: wait, passMark: PASS_MARK, total: QUIZ_SIZE, questions: drawQuestions() });
+  const { config } = await getQuiz();
+  return NextResponse.json({ passed: false, waitMs: wait, passMark: config.passMark, total: config.size, questions: drawQuestions(config) });
 }
 
 /** POST { answers: { [id]: index } } → graded result; sets the pass cookie on success */
@@ -35,7 +36,7 @@ export async function POST(req: Request) {
 
   const body = await req.json().catch(() => ({}));
   const answers = (body?.answers ?? {}) as Record<string, number>;
-  const result = grade(answers);
+  const result = grade(answers, (await getQuiz()).config);
 
   const res = NextResponse.json(result);
   if (result.passed) {

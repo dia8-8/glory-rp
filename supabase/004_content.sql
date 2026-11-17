@@ -1,4 +1,4 @@
--- Glory RP — content managed by admins: gallery, news/updates, interview questions.
+-- Glory RP — content managed by admins: gallery, news/updates, rules quiz questions.
 -- Run once in Supabase: SQL Editor → New query → paste → Run. Safe to run more than once.
 
 -- Gallery images (files live in the public "gallery" storage bucket)
@@ -27,7 +27,7 @@ create table if not exists public.news (
 );
 create index if not exists news_date_idx on public.news (date desc, created_at desc);
 
--- Key/value settings (e.g. key 'interview_fields' holds the interview questions)
+-- Key/value settings (e.g. key 'quiz' holds the rules quiz questions and pass mark)
 create table if not exists public.site_settings (
   key         text primary key,
   value       jsonb not null,

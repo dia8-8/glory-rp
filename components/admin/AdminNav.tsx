@@ -9,7 +9,7 @@ const TABS = [
   { href: '/admin', en: 'Submissions', ar: 'الطلبات', Icon: Inbox, admin: false },
   { href: '/admin/gallery', en: 'Gallery', ar: 'المعرض', Icon: Images, admin: true },
   { href: '/admin/news', en: 'Updates', ar: 'الأخبار', Icon: Newspaper, admin: true },
-  { href: '/admin/interview', en: 'Interview questions', ar: 'أسئلة المقابلة', Icon: ListChecks, admin: true },
+  { href: '/admin/quiz', en: 'Rules quiz', ar: 'اختبار القوانين', Icon: ListChecks, admin: true },
 ];
 
 export default function AdminNav({ admin }: { admin: boolean }) {

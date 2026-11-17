@@ -5,7 +5,7 @@ import { authOptions } from '@/lib/auth';
 import { protectAndRecord } from '@/lib/server/submissions';
 import { cookies } from 'next/headers';
 import { hasPassed, PASS_COOKIE } from '@/lib/server/quiz';
-import { getInterviewFields } from '@/lib/server/content';
+import { DEFAULT_INTERVIEW_FIELDS } from '@/lib/interview';
 
 function trim(s: unknown, n: number) {
   const x = String(s ?? '');
@@ -66,8 +66,8 @@ export async function POST(req: Request) {
 
   const raw = (await req.json().catch(() => ({}))) as Record<string, unknown>;
 
-  // Questions set by admins (or the originals). Only their answers are kept.
-  const { fields: questions } = await getInterviewFields();
+  // Only answers to the interview questions are kept.
+  const questions = DEFAULT_INTERVIEW_FIELDS;
   const body: Record<string, unknown> = { rulesOk: raw.rulesOk };
   for (const q of questions) body[q.name] = typeof raw[q.name] === 'string' ? (raw[q.name] as string).trim().slice(0, 4000) : raw[q.name];
 
