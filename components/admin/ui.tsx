@@ -52,13 +52,15 @@ export function SetupNeeded({ isAr, file = 'supabase/004_content.sql' }: { isAr:
   );
 }
 
-export function AdminsOnly({ isAr }: { isAr: boolean }) {
+export function AdminsOnly({ isAr, vip }: { isAr: boolean; vip?: boolean }) {
   return (
     <div className="card max-w-lg p-8">
       <ShieldAlert className="h-10 w-10 text-red-300" />
-      <h2 className="mt-4 text-2xl font-extrabold">{isAr ? 'للأدمن فقط' : 'Admins only'}</h2>
+      <h2 className="mt-4 text-2xl font-extrabold">{vip ? (isAr ? 'لإدارة المتجر فقط' : 'VIP admins only') : isAr ? 'للأدمن فقط' : 'Admins only'}</h2>
       <p className="mt-2 text-white/60">
-        {isAr ? 'تحتاج رتبة الأدمن في الديسكورد لتعديل محتوى الموقع.' : 'You need the Admin role on Discord to edit site content.'}
+        {vip
+          ? isAr ? 'تحتاج رتبة VIP Admin في الديسكورد لإدارة المتجر.' : 'You need the VIP Admin role on Discord to manage the store.'
+          : isAr ? 'تحتاج رتبة الأدمن في الديسكورد لتعديل محتوى الموقع.' : 'You need the Admin role on Discord to edit site content.'}
       </p>
     </div>
   );

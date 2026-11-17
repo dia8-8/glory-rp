@@ -9,13 +9,13 @@ import { ShieldAlert, LogIn } from 'lucide-react';
 export const dynamic = 'force-dynamic';
 export const metadata = { title: 'Staff Dashboard', robots: { index: false } };
 
-/** Every /admin page: staff (or admin) only, with the tab bar on top. */
+/** Every /admin page: staff, admins or VIP admins only, with the tab bar on top. */
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const isAr = getLang() === 'ar';
   const session = await getServerSession(authOptions);
   const access = await getAccess(session?.user?.id);
 
-  if (!session || !access.staff) {
+  if (!session || !(access.staff || access.vipAdmin)) {
     return (
       <main className="page-shell flex items-center">
         <div className="card mx-auto my-32 max-w-md p-10 text-center">
@@ -39,7 +39,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   return (
     <main className="page-shell">
       <div className="mx-auto max-w-7xl px-4 pb-24 pt-28 md:pt-32">
-        <AdminNav admin={access.admin} />
+        <AdminNav access={access} />
         {children}
       </div>
     </main>

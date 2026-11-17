@@ -32,18 +32,24 @@ export function adminRoleIds(): string[] {
   return idList(process.env.DISCORD_ADMIN_ROLE_IDS);
 }
 
-export type Access = { staff: boolean; admin: boolean };
+/** VIP admins = DISCORD_VIP_ADMIN_ROLE_IDS (comma separated). They manage the VIP store only. */
+export function vipAdminRoleIds(): string[] {
+  return idList(process.env.DISCORD_VIP_ADMIN_ROLE_IDS);
+}
+
+/** staff: review submissions · admin: site content (+ staff) · vipAdmin: the VIP store (admins too) */
+export type Access = { staff: boolean; admin: boolean; vipAdmin: boolean };
 const accessCache = new Map<string, { access: Access; at: number }>();
 
 /** Looks up the member's roles once (cached 60s) and works out staff/admin access. */
 export async function getAccess(discordId?: string | null): Promise<Access> {
-  if (!discordId) return { staff: false, admin: false };
+  if (!discordId) return { staff: false, admin: false, vipAdmin: false };
   const hit = accessCache.get(discordId);
   if (hit && Date.now() - hit.at < 60_000) return hit.access;
   const roles = (await getMemberRoles(discordId)) ?? [];
   const has = (ids: string[]) => ids.length > 0 && roles.some((r) => ids.includes(r));
   const admin = has(adminRoleIds());
-  const access = { admin, staff: admin || has(staffRoleIds()) };
+  const access = { admin, staff: admin || has(staffRoleIds()), vipAdmin: admin || has(vipAdminRoleIds()) };
   accessCache.set(discordId, { access, at: Date.now() });
   return access;
 }
@@ -54,6 +60,10 @@ export async function isStaff(discordId?: string | null): Promise<boolean> {
 
 export async function isAdmin(discordId?: string | null): Promise<boolean> {
   return (await getAccess(discordId)).admin;
+}
+
+export async function isVipAdmin(discordId?: string | null): Promise<boolean> {
+  return (await getAccess(discordId)).vipAdmin;
 }
 
 export async function addRole(discordId: string, roleId?: string) {

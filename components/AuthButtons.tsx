@@ -23,11 +23,15 @@ export default function AuthButtons() {
 
   // Show the dashboard link only to staff
   const [staff, setStaff] = useState(false);
+  const [vipOnly, setVipOnly] = useState(false);
   useEffect(() => {
     if (status !== 'authenticated') return;
     fetch('/api/admin/me')
       .then((r) => (r.ok ? r.json() : { staff: false }))
-      .then((j) => setStaff(!!j.staff))
+      .then((j) => {
+        setStaff(!!j.staff || !!j.vipAdmin);
+        setVipOnly(!j.staff && !!j.vipAdmin);
+      })
       .catch(() => {});
   }, [status]);
 
@@ -78,13 +82,13 @@ export default function AuthButtons() {
             </Link>
             {staff && (
               <Link
-                href="/admin"
+                href={vipOnly ? '/admin/store' : '/admin'}
                 role="menuitem"
                 onClick={() => setOpen(false)}
                 className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm text-white/80 hover:bg-white/5 hover:text-white"
               >
                 <ShieldCheck className="h-4 w-4 text-brand" />
-                {isAr ? 'لوحة الإدارة' : 'Staff Dashboard'}
+                {vipOnly ? (isAr ? 'إدارة المتجر' : 'Manage store') : isAr ? 'لوحة الإدارة' : 'Staff Dashboard'}
               </Link>
             )}
             <button

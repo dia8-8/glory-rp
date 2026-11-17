@@ -1,0 +1,188 @@
+// Tebex connection — server only.
+//
+//   TEBEX_PUBLIC_TOKEN   Headless API public token (Tebex panel → Integrations → Headless API).
+//                        Used to list packages and create checkouts.
+//   TEBEX_PRIVATE_KEY    Plugin API secret key (Tebex panel → Game servers → your server → secret key).
+//                        Only needed to create discount coupons for sales and bundles.
+//
+// Tebex handles payments and delivery (in-game items via the FiveM Tebex resource, Discord roles
+// via the package's Discord deliverable). This file never touches money.
+//
+// Docs: https://docs.tebex.io/developers/headless-api/endpoints · https://docs.tebex.io/plugin/endpoints/coupons
+
+import { randomInt } from 'node:crypto';
+
+const HEADLESS = 'https://headless.tebex.io/api/accounts';
+const PLUGIN = 'https://plugin.tebex.io';
+
+export const tebexConfigured = () => !!process.env.TEBEX_PUBLIC_TOKEN;
+export const couponsConfigured = () => !!process.env.TEBEX_PRIVATE_KEY;
+
+export class TebexError extends Error {
+  constructor(message: string, public status = 502) {
+    super(message);
+  }
+}
+
+function base() {
+  const token = process.env.TEBEX_PUBLIC_TOKEN;
+  if (!token) throw new TebexError('Tebex is not configured (TEBEX_PUBLIC_TOKEN missing).', 503);
+  return `${HEADLESS}/${encodeURIComponent(token)}`;
+}
+
+async function call<T>(url: string, init: RequestInit & { revalidate?: number } = {}): Promise<T> {
+  const { revalidate, ...rest } = init;
+  const r = await fetch(url, {
+    ...rest,
+    headers: { Accept: 'application/json', 'Content-Type': 'application/json', ...rest.headers },
+    ...(revalidate !== undefined ? { next: { revalidate } } : { cache: 'no-store' }),
+    signal: AbortSignal.timeout(10_000),
+  }).catch((e) => {
+    throw new TebexError(`Could not reach Tebex: ${e?.message || e}`);
+  });
+  const text = await r.text();
+  let json: any = null;
+  try {
+    json = text ? JSON.parse(text) : null;
+  } catch {
+    /* not JSON */
+  }
+  if (!r.ok) {
+    const msg = json?.detail || json?.message || json?.error_message || json?.title || text.slice(0, 200) || r.statusText;
+    throw new TebexError(`Tebex ${r.status}: ${msg}`, r.status >= 500 ? 502 : r.status);
+  }
+  return json as T;
+}
+
+/* ───────── Headless API (public token) ───────── */
+
+export type TebexPackage = {
+  id: number;
+  ident?: string;
+  name: string;
+  description?: string;
+  image?: string | null;
+  base_price: number;
+  total_price: number;
+  sales_tax?: number;
+  currency: string;
+  discount?: number;
+  category?: { id: number; name: string };
+  disable_quantity?: boolean;
+};
+
+export type TebexWebstore = { id: number; name: string; currency: string; webstore_url?: string; supports_usernames?: boolean; platform_type?: string };
+
+export async function getWebstore(): Promise<TebexWebstore> {
+  const j = await call<{ data: TebexWebstore }>(`${base()}/`, { revalidate: 300 });
+  return j.data;
+}
+
+/** All packages with live prices (cached for 60 seconds). */
+export async function getPackages(): Promise<TebexPackage[]> {
+  const j = await call<{ data: TebexPackage[] }>(`${base()}/packages`, { revalidate: 60 });
+  return j.data ?? [];
+}
+
+type Basket = { ident: string; links?: { checkout?: string; payment?: string }; packages?: unknown[]; total_price?: number };
+
+export async function createBasket(opts: { completeUrl: string; cancelUrl: string; ipAddress?: string; custom?: Record<string, unknown> }) {
+  const j = await call<{ data: Basket }>(`${base()}/baskets`, {
+    method: 'POST',
+    body: JSON.stringify({
+      complete_url: opts.completeUrl,
+      cancel_url: opts.cancelUrl,
+      complete_auto_redirect: true,
+      custom: opts.custom ?? {},
+      // Tebex asks for the customer's IP when the basket is created by a server
+      ...(opts.ipAddress ? { ip_address: opts.ipAddress } : {}),
+    }),
+  });
+  return j.data;
+}
+
+/** Sign-in links for baskets that need the player's game account (FiveM stores log in with cfx.re). */
+export async function getBasketAuthLinks(basketIdent: string, returnUrl: string) {
+  const j = await call<{ name: string; url: string }[] | { data: { name: string; url: string }[] }>(
+    `${base()}/baskets/${encodeURIComponent(basketIdent)}/auth?returnUrl=${encodeURIComponent(returnUrl)}`
+  );
+  return Array.isArray(j) ? j : j?.data ?? [];
+}
+
+export async function addPackageToBasket(basketIdent: string, packageId: string | number, quantity = 1) {
+  // Path as documented: /{basketIdent}/packages (no /baskets prefix)
+  const j = await call<{ data: Basket }>(`${base()}/${encodeURIComponent(basketIdent)}/packages`, {
+    method: 'POST',
+    body: JSON.stringify({ package_id: String(packageId), quantity }),
+  });
+  return j.data;
+}
+
+export async function applyCoupon(basketIdent: string, code: string) {
+  return call<{ success: boolean; message: string }>(`${base()}/baskets/${encodeURIComponent(basketIdent)}/coupons`, {
+    method: 'POST',
+    body: JSON.stringify({ coupon_code: code }),
+  });
+}
+
+export async function getBasket(basketIdent: string) {
+  const j = await call<{ data: Basket }>(`${base()}/baskets/${encodeURIComponent(basketIdent)}`);
+  return j.data;
+}
+
+/* ───────── Plugin API (secret key) — coupons for sales & bundles ───────── */
+
+function pluginHeaders() {
+  const key = process.env.TEBEX_PRIVATE_KEY;
+  if (!key) throw new TebexError('TEBEX_PRIVATE_KEY is missing, so discounts can’t be created.', 503);
+  return { 'X-Tebex-Secret': key };
+}
+
+const ymd = (d: Date) => d.toISOString().slice(0, 10);
+
+/** Creates a percentage coupon limited to the given packages. Returns { id, code }. */
+export async function createCoupon(opts: {
+  code: string;
+  packageIds: number[];
+  percent: number;
+  start?: Date;
+  end?: Date | null;
+  minimum?: number;
+  note: string;
+}) {
+  const j = await call<{ data: { id: number; code: string } }>(`${PLUGIN}/coupons`, {
+    method: 'POST',
+    headers: pluginHeaders(),
+    body: JSON.stringify({
+      code: opts.code,
+      effective_on: 'package',
+      packages: opts.packageIds,
+      discount_type: 'percentage',
+      discount_percentage: opts.percent,
+      discount_amount: 0,
+      redeem_unlimited: true,
+      expire_never: !opts.end,
+      ...(opts.end ? { expire_date: ymd(opts.end) } : {}),
+      start_date: ymd(opts.start ?? new Date()),
+      basket_type: 'both',
+      minimum: opts.minimum ?? 0,
+      discount_application_method: 0,
+      note: opts.note,
+    }),
+  });
+  return { id: String(j.data.id), code: j.data.code ?? opts.code };
+}
+
+export async function deleteCoupon(id: string) {
+  await call(`${PLUGIN}/coupons/${encodeURIComponent(id)}`, { method: 'DELETE', headers: pluginHeaders() }).catch((e: TebexError) => {
+    if (e.status !== 404) throw e; // already gone is fine
+  });
+}
+
+/** Random, hard-to-guess coupon code, e.g. GLORY-SALE-7K2M9QX4 */
+export function couponCode(prefix: string) {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let s = '';
+  for (let i = 0; i < 8; i++) s += chars[randomInt(chars.length)];
+  return `GLORY-${prefix}-${s}`;
+}

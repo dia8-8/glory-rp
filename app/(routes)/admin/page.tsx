@@ -1,3 +1,7 @@
+import { redirect } from 'next/navigation';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
+import { getAccess } from '@/lib/server/discord';
 import { db } from '@/lib/server/db';
 import { DEFAULT_INTERVIEW_FIELDS } from '@/lib/interview';
 import { JOBS } from '@/lib/jobs';
@@ -24,7 +28,10 @@ async function buildLabels(): Promise<Labels> {
   return { fields, categories };
 }
 
-// Access is checked in admin/layout.tsx
+// Access is checked in admin/layout.tsx; VIP admins who aren't staff go straight to the store.
 export default async function AdminPage() {
+  const session = await getServerSession(authOptions);
+  const access = await getAccess(session?.user?.id);
+  if (!access.staff && access.vipAdmin) redirect('/admin/store');
   return <AdminDashboard labels={await buildLabels()} configured={!!db()} />;
 }

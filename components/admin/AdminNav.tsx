@@ -2,20 +2,22 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import clsx from 'clsx';
-import { Inbox, Images, Newspaper, ListChecks } from 'lucide-react';
+import { Inbox, Images, Newspaper, ListChecks, ShoppingBag } from 'lucide-react';
 import { useLang } from '@/lib/providers';
 
-const TABS = [
-  { href: '/admin', en: 'Submissions', ar: 'الطلبات', Icon: Inbox, admin: false },
-  { href: '/admin/gallery', en: 'Gallery', ar: 'المعرض', Icon: Images, admin: true },
-  { href: '/admin/news', en: 'Updates', ar: 'الأخبار', Icon: Newspaper, admin: true },
-  { href: '/admin/quiz', en: 'Rules quiz', ar: 'اختبار القوانين', Icon: ListChecks, admin: true },
+type Access = { staff: boolean; admin: boolean; vipAdmin: boolean };
+const TABS: { href: string; en: string; ar: string; Icon: typeof Inbox; need: keyof Access }[] = [
+  { href: '/admin', en: 'Submissions', ar: 'الطلبات', Icon: Inbox, need: 'staff' },
+  { href: '/admin/store', en: 'VIP store', ar: 'متجر VIP', Icon: ShoppingBag, need: 'vipAdmin' },
+  { href: '/admin/gallery', en: 'Gallery', ar: 'المعرض', Icon: Images, need: 'admin' },
+  { href: '/admin/news', en: 'Updates', ar: 'الأخبار', Icon: Newspaper, need: 'admin' },
+  { href: '/admin/quiz', en: 'Rules quiz', ar: 'اختبار القوانين', Icon: ListChecks, need: 'admin' },
 ];
 
-export default function AdminNav({ admin }: { admin: boolean }) {
+export default function AdminNav({ access }: { access: Access }) {
   const pathname = usePathname();
   const { lang } = useLang();
-  const tabs = TABS.filter((t) => admin || !t.admin);
+  const tabs = TABS.filter((t) => access[t.need]);
   if (tabs.length < 2) return null;
 
   return (

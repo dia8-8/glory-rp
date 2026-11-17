@@ -16,9 +16,10 @@ import { ServerStatusPill, ConnectButton } from "@/components/home/ServerStatus"
 import { SectionHeading, Features, Gallery, Faq, NewsPreview, type GalleryItem, type NewsItem } from "@/components/home/Sections";
 import { useLiveStreamers } from "@/lib/useLive";
 import { useStatus } from "@/lib/useStatus";
+import SaleSpotlight, { type HomeSales } from "@/components/home/SaleSpotlight";
 import { SITE } from "@/lib/site";
 
-export default function HomeClient({ gallery, news }: { gallery: GalleryItem[]; news: NewsItem[] }) {
+export default function HomeClient({ gallery, news, sales }: { gallery: GalleryItem[]; news: NewsItem[]; sales: HomeSales | null }) {
   const { lang } = useLang();
   const L = t(lang);
   const { streamers: STREAMERS, live } = useLiveStreamers();
@@ -93,6 +94,8 @@ export default function HomeClient({ gallery, news }: { gallery: GalleryItem[]; 
           <span className="h-2 w-1 rounded-full bg-brand animate-scroll-hint" />
         </a>
       </section>
+
+      {sales && <SaleSpotlight data={sales} />}
 
       <Features />
 
