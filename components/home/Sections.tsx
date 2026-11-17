@@ -219,6 +219,20 @@ export function Faq() {
 }
 
 /* ───────── News list (home preview + /news page) ───────── */
+const MONTHS_EN = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+const MONTHS_AR = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
+
+/**
+ * "2026-11-16" → "16 November 2026" / "16 نوفمبر 2026".
+ * Formatted by hand (not Intl) so server and browser always produce identical text,
+ * and parsed as plain numbers so the day never shifts with the viewer's timezone.
+ */
+function formatDate(iso: string, isAr: boolean) {
+  const [y, m, d] = iso.split('-').map(Number);
+  if (!y || !m || !d) return iso;
+  return `${d} ${(isAr ? MONTHS_AR : MONTHS_EN)[m - 1]} ${y}`;
+}
+
 export function NewsList({ limit }: { limit?: number }) {
   const { isAr, tr } = useBi();
   const items = limit ? NEWS.slice(0, limit) : NEWS;
@@ -235,7 +249,7 @@ export function NewsList({ limit }: { limit?: number }) {
               <div className="flex flex-wrap items-center gap-3 text-xs">
                 <span className="pill">{tr(n.tag)}</span>
                 <time dateTime={n.date} className="text-white/45" dir="ltr">
-                  {new Date(n.date).toLocaleDateString(isAr ? 'ar' : 'en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
+                  {formatDate(n.date, isAr)}
                 </time>
               </div>
               <h3 className="mt-3 text-lg font-bold">{tr(n.title)}</h3>

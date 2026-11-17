@@ -40,13 +40,14 @@ export default function NavbarShell({
     <header className="fixed inset-x-0 top-0 z-50 px-3 pt-3 sm:px-4">
       <div
         className={clsx(
-          'mx-auto flex max-w-7xl items-center justify-between gap-3 rounded-2xl border px-3 py-2 transition-all duration-300 sm:px-4',
+          // Mobile: logo | buttons. Desktop: equal side columns so the links sit in the exact centre.
+          'mx-auto flex max-w-7xl items-center justify-between gap-3 rounded-2xl border px-3 py-2 transition-all duration-300 sm:px-4 lg:grid lg:grid-cols-[1fr_auto_1fr]',
           scrolled || open
             ? 'border-white/10 bg-ink/80 shadow-[0_10px_40px_-15px_rgba(0,0,0,0.8)] backdrop-blur-xl'
             : 'border-transparent bg-transparent'
         )}
       >
-        <Link href="/" className="group flex items-center gap-3">
+        <Link href="/" className="group flex items-center gap-3 lg:justify-self-start">
           <span className="relative">
             <Image
               src="/logo.png"
@@ -83,7 +84,7 @@ export default function NavbarShell({
           ))}
         </nav>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 lg:justify-self-end">
           <div className="hidden lg:block">{cta}</div>
           {actions}
           <button
