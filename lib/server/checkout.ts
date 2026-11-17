@@ -7,6 +7,18 @@ import { saleByProduct, type BundleRow, type ProductRow, type SaleRow } from './
 import { addPackageToBasket, applyCoupon, createBasket, getBasket, getBasketAuthLinks, getWebstore, TebexError } from './tebex';
 
 export type CheckoutItems = { basket: string; packages: string[]; coupons: string[]; exp: number };
+export type CartItem = { kind: 'product' | 'bundle'; id: string };
+export const MAX_CART_ITEMS = 20;
+
+/** Runs one Tebex step and puts its name in front of any error, e.g. "Creating the basket: Tebex 422: …" */
+async function step<T>(label: string, fn: () => Promise<T>): Promise<T> {
+  try {
+    return await fn();
+  } catch (e) {
+    if (e instanceof TebexError) throw new TebexError(`${label}: ${e.message}`, e.status);
+    throw e;
+  }
+}
 
 const secret = () => process.env.NEXTAUTH_SECRET || 'dev-secret';
 const b64 = (s: string) => Buffer.from(s).toString('base64url');
@@ -65,41 +77,60 @@ export async function resolvePurchase(kind: 'product' | 'bundle', id: string) {
 /** Adds the items to the basket and returns the Tebex payment URL. */
 export async function fillAndGetCheckoutUrl(basket: string, packages: string[], coupons: string[]) {
   // Safe to call twice (e.g. the player reloads the page): only fill an empty basket
-  const current = await getBasket(basket);
+  const current = await step('Reading the basket', () => getBasket(basket));
   if (current.packages?.length) {
     if (!current.links?.checkout) throw new TebexError('This checkout was already completed.', 409);
     return current.links.checkout;
   }
-  for (const p of packages) await addPackageToBasket(basket, p, 1);
+  for (const p of packages) await step(`Adding package ${p}`, () => addPackageToBasket(basket, p, 1));
   for (const code of coupons) {
     // A failed coupon shouldn't block the purchase — the customer sees the real price on Tebex before paying
     await applyCoupon(basket, code).catch((e) => console.error('[checkout] coupon failed:', code, (e as Error).message));
   }
-  const b = await getBasket(basket);
+  const b = await step('Reading the basket', () => getBasket(basket));
   if (!b.links?.checkout) throw new TebexError('Tebex did not return a checkout link.');
   return b.links.checkout;
 }
 
 /**
- * Starts a checkout. Returns the URL to send the player to:
+ * Starts a checkout for everything in the cart. Returns the URL to send the player to:
  *  • stores that need the player's game account (FiveM → cfx.re login) → the Tebex sign-in page first
  *  • otherwise → straight to the Tebex payment page
  */
-export async function startCheckout(opts: { kind: 'product' | 'bundle'; id: string; ip?: string; discordId?: string | null }) {
-  const purchase = await resolvePurchase(opts.kind, opts.id);
-  const basket = await createBasket({
-    completeUrl: `${SITE.url}/vipshop?paid=1`,
-    cancelUrl: `${SITE.url}/vipshop?cancelled=1`,
-    ipAddress: opts.ip,
-    custom: { source: 'website', item: `${opts.kind}:${opts.id}`, ...(opts.discordId ? { discord_id: opts.discordId } : {}) },
-  });
+export async function startCheckout(opts: { items: CartItem[]; ip?: string; discordId?: string | null }) {
+  if (!opts.items.length) throw new TebexError('Your cart is empty.', 400);
+  if (opts.items.length > MAX_CART_ITEMS) throw new TebexError(`Maximum ${MAX_CART_ITEMS} items per order.`, 400);
 
-  const store = await getWebstore();
+  // Resolve every item; one package is only bought once even if it's in a bundle and on its own
+  const packages: string[] = [];
+  const coupons: string[] = [];
+  for (const item of opts.items) {
+    const r = await resolvePurchase(item.kind, item.id);
+    for (const p of r.packages) if (!packages.includes(p)) packages.push(p);
+    for (const c of r.coupons) if (!coupons.includes(c)) coupons.push(c);
+  }
+
+  const basket = await step('Creating the basket', () =>
+    createBasket({
+      completeUrl: `${SITE.url}/vipshop?paid=1`,
+      cancelUrl: `${SITE.url}/vipshop?cancelled=1`,
+      ipAddress: opts.ip,
+      custom: {
+        source: 'website',
+        items: opts.items.map((i) => `${i.kind}:${i.id}`).join(','),
+        ...(opts.discordId ? { discord_id: opts.discordId } : {}),
+      },
+    })
+  );
+
+  const store = await step('Reading the store settings', () => getWebstore());
   if (store.supports_usernames) {
-    const token = signItems({ basket: basket.ident, packages: purchase.packages, coupons: purchase.coupons, exp: Date.now() + 30 * 60_000 });
-    const links = await getBasketAuthLinks(basket.ident, `${SITE.url}/api/store/continue?t=${encodeURIComponent(token)}`);
+    const token = signItems({ basket: basket.ident, packages, coupons, exp: Date.now() + 30 * 60_000 });
+    const links = await step('Getting the FiveM login link', () =>
+      getBasketAuthLinks(basket.ident, `${SITE.url}/api/store/continue?t=${encodeURIComponent(token)}`)
+    );
     if (!links.length) throw new TebexError('Tebex did not return a sign-in link for this store.');
     return links[0].url;
   }
-  return fillAndGetCheckoutUrl(basket.ident, purchase.packages, purchase.coupons);
+  return fillAndGetCheckoutUrl(basket.ident, packages, coupons);
 }

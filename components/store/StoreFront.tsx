@@ -2,9 +2,11 @@
 import { useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ShoppingCart, Package, Percent, Timer, CheckCircle2, XCircle, ShieldCheck, Loader2 } from 'lucide-react';
+import { ShoppingCart, Package, Percent, Timer, CheckCircle2, XCircle, ShieldCheck, Check } from 'lucide-react';
 import clsx from 'clsx';
 import { useLang } from '@/lib/providers';
+import { useCart } from './useCart';
+import CartDrawer from './CartDrawer';
 
 type Bi = { en: string; ar: string };
 type Product = {
@@ -49,7 +51,9 @@ export default function StoreFront({ data, status }: { data: StoreData; status?:
   const isAr = lang === 'ar';
   const tr = (b: Bi) => (isAr ? b.ar || b.en : b.en || b.ar);
   const [tab, setTab] = useState('all');
-  const [buying, setBuying] = useState<string | null>(null);
+  const cart = useCart();
+  const [cartOpen, setCartOpen] = useState(false);
+  const [bump, setBump] = useState(0);
   const [error, setError] = useState<string | null>(status === 'error' ? (isAr ? 'تعذر إكمال الدفع. حاول مرة أخرى.' : 'The checkout couldn’t be completed. Please try again.') : null);
   const [banner, setBanner] = useState(status);
 
@@ -63,17 +67,26 @@ export default function StoreFront({ data, status }: { data: StoreData; status?:
   const products = tab === 'all' ? data.products : tab === 'sale' ? data.products.filter((p) => p.salePrice !== null) : data.products.filter((p) => p.category === tab);
   const showBundles = (tab === 'all' || tab === 'bundles') && data.bundles.length > 0;
 
-  async function buy(kind: 'product' | 'bundle', id: string) {
-    setBuying(id);
+  // After a successful payment, empty the cart
+  useEffect(() => {
+    if (status === 'paid' && cart.ready) cart.clear();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [status, cart.ready]);
+
+  // Products already covered by a bundle in the cart can't be added on their own
+  const coveredByBundle = useMemo(() => {
+    const ids = new Set<string>();
+    for (const i of cart.items) if (i.kind === 'bundle') data.bundles.find((b) => b.id === i.id)?.items.forEach((x) => ids.add(x.id));
+    return ids;
+  }, [cart.items, data.bundles]);
+
+  function toggle(kind: 'product' | 'bundle', id: string) {
     setError(null);
-    const r = await fetch('/api/store/checkout', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ kind, id }) }).catch(() => null);
-    const j = r ? await r.json().catch(() => ({})) : {};
-    if (r?.ok && j.url) {
-      window.location.href = j.url; // Tebex sign-in / payment page
-      return;
-    }
-    setBuying(null);
-    setError(j.error || (isAr ? 'حدث خطأ، حاول مرة أخرى.' : 'Something went wrong, please try again.'));
+    if (cart.has(kind, id)) return cart.remove(kind, id);
+    // adding a bundle replaces its products if they were added on their own
+    const replaces = kind === 'bundle' ? data.bundles.find((b) => b.id === id)?.items.map((x) => x.id) ?? [] : [];
+    cart.add({ kind, id }, replaces);
+    setBump((n) => n + 1);
   }
 
   const topSale = [...data.sales].sort((a, b) => b.percent - a.percent)[0];
@@ -157,7 +170,7 @@ export default function StoreFront({ data, status }: { data: StoreData; status?:
                       {b.discountPercent > 0 && <span className="me-2 text-sm text-white/40 line-through">{money(b.price, data.currency)}</span>}
                       <span className="text-2xl font-extrabold text-brand">{money(b.finalPrice, data.currency)}</span>
                     </div>
-                    <BuyButton busy={buying === b.id} disabled={!!buying} onClick={() => buy('bundle', b.id)} isAr={isAr} />
+                    <CartButton inCart={cart.has('bundle', b.id)} onClick={() => toggle('bundle', b.id)} isAr={isAr} />
                   </div>
                 </div>
               </article>
@@ -192,7 +205,11 @@ export default function StoreFront({ data, status }: { data: StoreData; status?:
                       {p.salePrice !== null && <span className="me-2 text-sm text-white/40 line-through">{money(p.price, data.currency)}</span>}
                       <span className="text-xl font-extrabold text-brand">{money(p.salePrice ?? p.price, data.currency)}</span>
                     </div>
-                    <BuyButton busy={buying === p.id} disabled={!!buying} onClick={() => buy('product', p.id)} isAr={isAr} />
+                    {coveredByBundle.has(p.id) ? (
+                      <span className="btn btn-ghost shrink-0 cursor-default text-xs text-white/50"><Package className="h-4 w-4" /> {isAr ? 'ضمن باقة' : 'In a bundle'}</span>
+                    ) : (
+                      <CartButton inCart={cart.has('product', p.id)} onClick={() => toggle('product', p.id)} isAr={isAr} />
+                    )}
                   </div>
                 </div>
               </article>
@@ -200,6 +217,30 @@ export default function StoreFront({ data, status }: { data: StoreData; status?:
           </div>
         </>
       )}
+
+      {/* Floating cart button */}
+      {cart.ready && cart.items.length > 0 && !cartOpen && (
+        <motion.button
+          key={bump}
+          initial={{ scale: 0.9 }}
+          animate={{ scale: [1.12, 1] }}
+          transition={{ duration: 0.3 }}
+          onClick={() => setCartOpen(true)}
+          className="btn btn-primary fixed bottom-24 left-4 z-[60] h-14 rounded-2xl px-5 text-base shadow-2xl lg:bottom-6 lg:left-6"
+          aria-label={isAr ? 'السلة' : 'Cart'}
+        >
+          <ShoppingCart className="h-5 w-5" /> {isAr ? 'السلة' : 'Cart'}
+          <span className="grid h-6 min-w-6 place-items-center rounded-full bg-ink px-1.5 text-xs font-extrabold text-brand">{cart.items.length}</span>
+        </motion.button>
+      )}
+
+      <CartDrawer
+        open={cartOpen}
+        onClose={() => setCartOpen(false)}
+        cart={cart}
+        data={data}
+        onError={(m) => { setError(m); setCartOpen(false); }}
+      />
 
       <p className="mx-auto mt-12 flex max-w-xl items-center justify-center gap-2 text-center text-xs text-white/45">
         <ShieldCheck className="h-4 w-4 shrink-0 text-brand" />
@@ -211,11 +252,14 @@ export default function StoreFront({ data, status }: { data: StoreData; status?:
   );
 }
 
-function BuyButton({ busy, disabled, onClick, isAr }: { busy: boolean; disabled: boolean; onClick: () => void; isAr: boolean }) {
-  return (
-    <button onClick={onClick} disabled={disabled} className="btn btn-primary shrink-0">
-      {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <ShoppingCart className="h-4 w-4" />}
-      {isAr ? 'شراء' : 'Buy'}
+function CartButton({ inCart, onClick, isAr }: { inCart: boolean; onClick: () => void; isAr: boolean }) {
+  return inCart ? (
+    <button onClick={onClick} className="btn btn-outline shrink-0" title={isAr ? 'إزالة من السلة' : 'Remove from cart'}>
+      <Check className="h-4 w-4" /> {isAr ? 'في السلة' : 'In cart'}
+    </button>
+  ) : (
+    <button onClick={onClick} className="btn btn-primary shrink-0">
+      <ShoppingCart className="h-4 w-4" /> {isAr ? 'أضف للسلة' : 'Add to cart'}
     </button>
   );
 }

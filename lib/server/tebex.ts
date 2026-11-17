@@ -1,9 +1,12 @@
 // Tebex connection — server only.
 //
-//   TEBEX_PUBLIC_TOKEN   Headless API public token (Tebex panel → Integrations → Headless API).
-//                        Used to list packages and create checkouts.
-//   TEBEX_PRIVATE_KEY    Plugin API secret key (Tebex panel → Game servers → your server → secret key).
-//                        Only needed to create discount coupons for sales and bundles.
+//   TEBEX_PUBLIC_TOKEN            Public token from creator.tebex.io/developers/api-keys (starts like "abcd-...").
+//                                 Used to list packages and create checkouts.
+//   TEBEX_HEADLESS_PRIVATE_KEY    Optional. Private key from the same api-keys page. Lets the server pass the
+//                                 buyer's real IP to Tebex (an authenticated request). Without it, baskets are
+//                                 created without the IP.
+//   TEBEX_PRIVATE_KEY             Game server secret key (Game servers → your server). Only needed to create
+//                                 discount coupons for sales and bundles (Plugin API).
 //
 // Tebex handles payments and delivery (in-game items via the FiveM Tebex resource, Discord roles
 // via the package's Discord deliverable). This file never touches money.
@@ -118,17 +121,31 @@ export async function getPackages(): Promise<TebexPackage[]> {
 type Basket = { ident: string; links?: { checkout?: string; payment?: string }; packages?: unknown[]; total_price?: number };
 
 export async function createBasket(opts: { completeUrl: string; cancelUrl: string; ipAddress?: string; custom?: Record<string, unknown> }) {
-  const j = await call<{ data: Basket }>(`${base()}/baskets`, {
-    method: 'POST',
-    body: JSON.stringify({
-      complete_url: opts.completeUrl,
-      cancel_url: opts.cancelUrl,
-      complete_auto_redirect: true,
-      custom: opts.custom ?? {},
-      // Tebex asks for the customer's IP when the basket is created by a server
-      ...(opts.ipAddress ? { ip_address: opts.ipAddress } : {}),
-    }),
-  });
+  const body = {
+    complete_url: opts.completeUrl,
+    cancel_url: opts.cancelUrl,
+    complete_auto_redirect: true,
+    custom: opts.custom ?? {},
+  };
+  const priv = process.env.TEBEX_HEADLESS_PRIVATE_KEY;
+  const token = process.env.TEBEX_PUBLIC_TOKEN ?? '';
+
+  // Passing the buyer's IP is an authenticated request (Basic auth: public token + private key).
+  if (priv && opts.ipAddress) {
+    try {
+      const j = await call<{ data: Basket }>(`${base()}/baskets`, {
+        method: 'POST',
+        headers: { Authorization: 'Basic ' + Buffer.from(`${token}:${priv}`).toString('base64') },
+        body: JSON.stringify({ ...body, ip_address: opts.ipAddress }),
+      });
+      return j.data;
+    } catch (e) {
+      // wrong/rotated key → fall back to a plain basket instead of blocking the purchase
+      if (!(e instanceof TebexError) || e.status >= 500) throw e;
+      console.error('[tebex] authenticated basket failed, retrying without IP:', e.message);
+    }
+  }
+  const j = await call<{ data: Basket }>(`${base()}/baskets`, { method: 'POST', body: JSON.stringify(body) });
   return j.data;
 }
 

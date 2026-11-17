@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { useLang } from '@/lib/providers';
 import Reveal from '@/components/Reveal';
+import BodyPortal from '@/components/BodyPortal';
 import { FEATURES, FAQ, type Bi } from '@/data/home';
 
 export type GalleryItem = { src: string; caption: Bi };
@@ -133,6 +134,7 @@ export function Gallery({ items: GALLERY }: { items: GalleryItem[] }) {
         ))}
       </div>
 
+      <BodyPortal>
       <AnimatePresence>
         {open !== null && (
           <motion.div
@@ -176,6 +178,7 @@ export function Gallery({ items: GALLERY }: { items: GalleryItem[] }) {
           </motion.div>
         )}
       </AnimatePresence>
+      </BodyPortal>
     </section>
   );
 }
