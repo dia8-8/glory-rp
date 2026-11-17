@@ -20,8 +20,7 @@ export default function BackToTop() {
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.85, y: 12 }}
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-          className="fixed bottom-6 right-6 z-[60] rounded-2xl px-3.5 py-3 shadow-lg ring-1 ring-white/20 text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
-          style={{ background: 'linear-gradient(135deg, var(--brand-from), var(--brand-to))' }}
+          className="fixed bottom-24 right-4 z-[60] lg:bottom-6 lg:right-6 grid h-12 w-12 place-items-center rounded-2xl bg-brand text-ink transition hover:-translate-y-0.5 hover:brightness-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand/60"
           aria-label="Back to top"
           title="Back to top"
         >

@@ -13,13 +13,13 @@ export default function CreatorCard({ name, avatar, image, url, link }: Props) {
   const href = url ?? link;
 
   const Inner = (
-    <div className="group relative w-full aspect-[3/4] overflow-hidden rounded-2xl border border-[#6c2de4] bg-white/5">
+    <div className="group relative w-full aspect-[3/4] overflow-hidden rounded-2xl border border-brand bg-white/5">
       <div className="absolute inset-5 sm:inset-6 grid place-items-center">
-        <div className="rounded-full p-2 sm:p-1.5 bg-black/20 ring-2 ring-[#6c2de4]/70">
+        <div className="rounded-full p-2 sm:p-1.5 bg-black/20 ring-2 ring-brand/70">
           <img
             src={src}
             alt={name}
-            className="h-24 w-auto sm:h-28 md:h-32 rounded-full object-contain ring-2 ring-[#6c2de4]/70 shadow-lg transition-transform duration-300 group-hover:scale-105"
+            className="h-24 w-auto sm:h-28 md:h-32 rounded-full object-contain ring-2 ring-brand/70 shadow-lg transition-transform duration-300 group-hover:scale-105"
           />
         </div>
       </div>

@@ -14,7 +14,7 @@ type Props = {
 export default function Particles({
   className,
   quantity = 60,
-  color = '#6c2de4',
+  color = '#50f018',
   size = [1.2, 2.6],
   speed = [0.08, 0.28],
   linkDistance = 90,

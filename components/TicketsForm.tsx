@@ -121,7 +121,7 @@ export default function TicketForm({
           name="discord"
           value={discordName}
           readOnly
-          className="mt-1 w-full rounded-xl border border-white/15 bg-white/10 px-3 py-2 opacity-90"
+          className="field cursor-not-allowed bg-white/5 text-white/60"
           aria-readonly="true"
         />
         <p className="mt-1 text-xs opacity-70">
@@ -153,7 +153,7 @@ export default function TicketForm({
                   onChange={onChange}
                   placeholder={placeholder}
                   required={!!f.required}
-                  className="mt-1 w-full rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-white/90 outline-none focus:border-[#a60be3] focus:ring-1 focus:ring-[#a60be3]"
+                  className="field"
                 />
               </div>
             );
@@ -171,7 +171,7 @@ export default function TicketForm({
                   onChange={onChange}
                   required={!!f.required}
                   placeholder={placeholder}
-                  className="mt-1 w-full rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-white/90 outline-none focus:border-[#a60be3] focus:ring-1 focus:ring-[#a60be3]"
+                  className="field"
                 />
               </div>
             );
@@ -187,7 +187,7 @@ export default function TicketForm({
                   value={form[f.name] ?? ''}
                   onChange={onChange}
                   required={!!f.required}
-                  className="mt-1 w-full rounded-xl border border-white/15 bg-[#2a0c4a]/40 text-white/90 px-3 py-2 outline-none transition focus:border-[#c27cff] focus:ring-1 focus:ring-[#c27cff] appearance-none"
+                  className="field appearance-none"
                 >
                   <option disabled value="">
                     {L.isAr ? 'اختر خياراً' : 'Select an option'}
@@ -225,7 +225,7 @@ export default function TicketForm({
                   checked={!!form[f.name]}
                   onChange={onChange}
                   required={!!f.required}
-                  className="h-5 w-5 accent-[#a60be3] rounded-md border border-white/30 bg-white/10 cursor-pointer"
+                  className="h-5 w-5 accent-brand rounded-md border border-white/30 bg-white/10 cursor-pointer"
                 />
                 <label
                   htmlFor={f.name}

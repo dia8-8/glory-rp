@@ -20,10 +20,10 @@ export default function JoinServerPage() {
         backgroundPosition: 'center',
       }}
     >
-      <div className="absolute inset-0 -z-10 bg-black/60" />
+      <div className="absolute inset-0 -z-10 bg-ink/80" />
 
       <section className="mx-auto flex min-h-[100dvh] max-w-xl items-center justify-center px-4 text-center">
-        <div className="w-full rounded-2xl border border-white/10 bg-black/40 p-8 backdrop-blur">
+        <div className="w-full card p-8 sm:p-10">
           <h1 className="text-3xl font-extrabold">
             Join Our Discord
           </h1>

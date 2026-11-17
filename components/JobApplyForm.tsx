@@ -73,7 +73,7 @@ export default function JobApplyForm({
           name="discord"
           value={discordName}
           readOnly
-          className="mt-1 w-full rounded-xl border border-white/15 bg-white/10 px-3 py-2 opacity-90"
+          className="field cursor-not-allowed bg-white/5 text-white/60"
           aria-readonly="true"
         />
         <p className="mt-1 text-xs opacity-70">
@@ -101,7 +101,7 @@ export default function JobApplyForm({
                   onChange={onChange}
                   placeholder={placeholder}
                   required={!!(f as any).required}
-                  className="mt-1 w-full rounded-xl border border-white/15 bg-white/5 px-3 py-2 outline-none focus:border-white/30"
+                  className="field"
                 />
               </div>
             );
@@ -116,7 +116,7 @@ export default function JobApplyForm({
                   value={form[f.name] ?? ''}
                   onChange={onChange}
                   required={!!(f as any).required}
-                   className="mt-1 w-full rounded-xl border border-white/15 bg-[#2a0c4a]/40 text-white/90 px-3 py-2 outline-none transition focus:border-[#c27cff] focus:ring-1 focus:ring-[#c27cff]">
+                   className="field">
                   <option value="">{L.isAr ? 'اختر' : 'Select'}</option>
                   {(f as any).options.map((o: any) => (
                     <option key={o.value} value={o.value}>
@@ -138,7 +138,7 @@ export default function JobApplyForm({
                 onChange={onChange}
                 required={!!(f as any).required}
                 placeholder={placeholder}
-                className="mt-1 w-full rounded-xl border border-white/15 bg-white/5 px-3 py-2 outline-none focus:border-white/30"
+                className="field"
               />
             </div>
           );

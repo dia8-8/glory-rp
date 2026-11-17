@@ -1,10 +1,12 @@
 "use client";
 
 import Reveal from "@/components/Reveal";
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { Search, X } from "lucide-react";
 
 export default function RulesClient({ lang, L }: any) {
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  const [query, setQuery] = useState("");
 
   // 👉 MOVE ALL YOUR UI HERE (the big JSX)
   type ColumnKey = 'type' | 'criminals' | 'police' | 'hostages' | 'outside';
@@ -789,27 +791,120 @@ const CATEGORIES = [
 
   const active = categorized.find(c => c.key === activeCategory);
 
+  // 🔎 Search across every rule (title + text, both languages)
+  const q = query.trim().toLowerCase();
+  const results = useMemo(() => {
+    if (q.length < 2) return [];
+    return categorized.flatMap((cat) =>
+      cat.items
+        .filter((r: any) =>
+          [r.titleAr, r.titleEn, r.textAr, r.textEn, r.textArBelow, r.textEnBelow]
+            .filter(Boolean)
+            .some((v: string) => v.toLowerCase().includes(q))
+        )
+        .map((r: any) => ({ ...r, catKey: cat.key, catTitle: cat.title }))
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [q, L.isAr]);
+
+  const highlight = (text: string) => {
+    if (q.length < 2 || !text) return text;
+    const escaped = q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const parts = text.split(new RegExp(`(${escaped})`, "gi"));
+    return parts.map((p, i) =>
+      p.toLowerCase() === q ? <mark key={i} className="rounded bg-brand/25 px-0.5 text-brand">{p}</mark> : p
+    );
+  };
+
   return (
   <div className="relative min-h-screen w-full">
     <div className="fixed inset-0 -z-10 bg-[url('/bg.png')] bg-cover bg-center" />
-    <div className="fixed inset-0 -z-10 bg-black/60" />
+    <div className="fixed inset-0 -z-10 bg-ink/85" /><div className="fixed inset-0 -z-10 bg-[radial-gradient(900px_480px_at_50%_-120px,rgb(var(--brand-rgb)/0.16),transparent_70%)]" />
 
     <main className="mx-auto max-w-5xl px-4 pt-24 sm:pt-28 md:pt-32 pb-24 ">
       <Reveal>
       {/* TITLE */}
       <div className="mb-14 text-center">
-        <h2 className="text-4xl font-bold">{L.nav.rules}</h2>
+        <h2 className="section-title text-gradient">{L.nav.rules}</h2>
         <p className="mt-3 text-white/70">{L.rules.body}</p>
       </div>
 
+      {/* SEARCH */}
+      <div className="relative mb-8">
+        <Search className="pointer-events-none absolute start-4 top-1/2 h-5 w-5 -translate-y-1/2 text-white/40" />
+        <input
+          type="search"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder={L.isAr ? "ابحث في القوانين… (مثال: رهائن، سرقة)" : "Search the rules… (e.g. hostage, robbery)"}
+          className="field mt-0 h-14 rounded-2xl ps-12 pe-12 text-base"
+        />
+        {query && (
+          <button
+            onClick={() => setQuery("")}
+            className="absolute end-3 top-1/2 grid h-8 w-8 -translate-y-1/2 place-items-center rounded-lg text-white/50 hover:bg-white/10 hover:text-white"
+            aria-label="Clear"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        )}
+      </div>
+
+      {/* SEARCH RESULTS */}
+      {q.length >= 2 && (
+        <div className="space-y-4">
+          <p className="text-sm text-white/50">
+            {L.isAr ? `${results.length} نتيجة` : `${results.length} result${results.length === 1 ? "" : "s"}`}
+          </p>
+          {results.length === 0 && (
+            <div className="card p-8 text-center text-white/60">
+              {L.isAr ? "لا توجد نتائج. جرّب كلمة أخرى." : "No rules found. Try another word."}
+            </div>
+          )}
+          {results.map((r: any, i: number) => {
+            const text = r.type === "table" ? "" : String(r.text ?? "");
+            const lines = text.split(/\r?\n+/).map((x: string) => x.trim()).filter(Boolean);
+            return (
+              <div key={i} className="card p-5 sm:p-6">
+                <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+                  <h4 className="font-semibold">{highlight(r.title)}</h4>
+                  <button
+                    onClick={() => { setActiveCategory(r.catKey); setQuery(""); }}
+                    className="pill hover:bg-brand hover:text-ink"
+                  >
+                    {r.catTitle}
+                  </button>
+                </div>
+                {r.type === "table" ? (
+                  <button
+                    onClick={() => { setActiveCategory(r.catKey); setQuery(""); }}
+                    className="btn btn-outline mt-2"
+                  >
+                    {L.isAr ? "عرض الجدول" : "View table"}
+                  </button>
+                ) : lines.length > 1 ? (
+                  <ul className="list-disc space-y-1 ps-5 text-white/75">
+                    {lines.map((line: string, k: number) => (
+                      <li key={k}>{highlight(line.replace(/^([•\-*]|\d+[.)])\s*/, ""))}</li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-white/75">{highlight(text)}</p>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
+
       {/* CATEGORY SELECT */}
-      {!activeCategory && (
+      {!activeCategory && q.length < 2 && (
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
           {categorized.map((cat) => (
             <button
               key={cat.key}
               onClick={() => setActiveCategory(cat.key)}
-              className="rounded-2xl border border-[#a865fa] bg-[#0f0f1a]/80 p-5 text-center hover:bg-[#a865fa]/20 transition"
+              className="card card-hover p-5 text-center font-semibold hover:text-brand"
             >
               {cat.title}
             </button>
@@ -818,20 +913,20 @@ const CATEGORIES = [
       )}
 
       {/* RULES VIEW */}
-      {active && (
+      {active && q.length < 2 && (
         <div className="mt-6">
           
           {/* 🔙 BACK BUTTON (IMPROVED) */}
           <button
             onClick={() => setActiveCategory(null)}
-            className="mb-8 inline-flex items-center gap-2 rounded-xl border border-[#a865fa] bg-[#a865fa]/10 px-4 py-2 text-sm font-medium text-white hover:bg-[#a865fa]/20 transition"
+            className="mb-8 inline-flex items-center gap-2 rounded-xl border border-brand/40 bg-brand/10 px-4 py-2 text-sm font-medium text-white hover:bg-brand/20 transition"
           >
             <span className="text-lg">←</span>
             {L.isAr ? "رجوع" : "Back"}
           </button>
 
           {/* CATEGORY TITLE */}
-          <h3 className="mb-6 text-2xl font-bold text-[#a865fa]">
+          <h3 className="mb-6 text-2xl font-bold text-brand flex items-center gap-3 before:h-6 before:w-1 before:rounded-full before:bg-brand before:shadow-glow">
             {active.title}
           </h3>
 
@@ -840,7 +935,7 @@ const CATEGORIES = [
             {active.items.map((r, i) => (
               <div
                 key={i}
-                className="rounded-2xl border border-[#a865fa]/40 bg-[#0f0f1a]/80 p-5 shadow-lg"
+                className="card p-5 sm:p-6"
               >
                 <h4 className="font-semibold mb-3 text-white">
                 {r.title}
@@ -849,10 +944,10 @@ const CATEGORIES = [
                 {/* 🔥 TABLE SUPPORT */}
                 {r.type === "table" && r.columns && r.rows ? (
                 <div className="overflow-x-auto">
-                    <table className="w-full text-sm border border-[#a865fa]/30 rounded-xl overflow-hidden">
+                    <table className="w-full text-sm border border-brand/30 rounded-xl overflow-hidden">
                     
                     {/* HEADER */}
-                    <thead className="bg-[#a865fa]/80 text-white">
+                    <thead className="bg-brand/15 text-brand">
                         <tr>
                         {r.columns.map((col, idx) => (
                             <th key={idx} className="px-3 py-2 text-center">
@@ -867,7 +962,7 @@ const CATEGORIES = [
                         {r.rows.map((row, i) => (
                         <tr
                             key={i}
-                            className={`text-center border-t border-[#a865fa]/20 ${
+                            className={`text-center border-t border-brand/20 ${
                             i % 2 ? "bg-white/5" : ""
                             }`}
                         >

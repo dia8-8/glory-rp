@@ -4,7 +4,7 @@ export type Lang = 'ar' | 'en';
 
 export function getLang(): Lang {
   const v = cookies().get('lang')?.value;
-  return v === 'ar' ? 'ar' : 'en';
+  return v === 'en' ? 'en' : 'ar';
 }
 
 
@@ -62,6 +62,6 @@ export function t(lang: Lang) {
       body: isAr ? 'قدّم للوظائف الإدارية أو صانع محتوى أو دعم فني. سنراجع طلبك سريعًا.' : 'Apply for staff, creator, or tech roles. We’ll review your application soon.',
       submit: isAr ? 'إرسال الطلب' : 'Submit',
     },
-    footer: isAr ? '© 2025 جميع الحقوق محفوظة' : '© 2025 All rights reserved',
+    footer: isAr ? '© 2026 جميع الحقوق محفوظة' : '© 2026 All rights reserved',
   } as const;
 }

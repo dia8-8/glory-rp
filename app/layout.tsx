@@ -6,23 +6,34 @@ import Footer from '@/components/Footer';
 import { getLang } from '@/lib/i18n-server';
 import { Providers } from '@/lib/providers';
 import BackToTop from '@/components/BackToTop';
+import MobileTabBar from '@/components/MobileTabBar';
+import { SITE } from '@/lib/site';
 import SessionWrapper from '@/components/SessionWrapper';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { Analytics } from "@vercel/analytics/next"
 
+const description =
+  'Glory RP — a serious Arabic FiveM roleplay server. Careers, businesses, gangs and an active creator community. | جلوري — سيرفر رول بلاي عربي جاد على فايف إم.';
+
 export const metadata: Metadata = {
-  title: 'Glory RP | جلوري',
-  description: 'Serious RP • FiveM • Arabic/English • Glory RP',
-  icons: { icon: [{ url: '/logo.png' }] },
+  metadataBase: new URL(SITE.url),
+  title: { default: 'Glory RP | جلوري', template: '%s | Glory RP' },
+  description,
+  applicationName: 'Glory RP',
+  keywords: ['Glory RP', 'جلوري', 'FiveM', 'Arabic RP', 'رول بلاي', 'GTA V RP'],
+  icons: { icon: [{ url: '/logo.png' }], apple: [{ url: '/logo.png' }] },
   openGraph: {
     title: 'Glory RP | جلوري',
-    description: 'Serious RP • FiveM • Arabic/English',
+    description,
     type: 'website',
-    images: ['/bg.png'],
+    siteName: 'Glory RP',
+    images: [{ url: '/og.png', width: 1200, height: 630, alt: 'Glory RP' }],
   },
-  twitter: { card: 'summary_large_image', images: ['/bg.png'] },
+  twitter: { card: 'summary_large_image', title: 'Glory RP | جلوري', description, images: ['/og.png'] },
 };
+
+export const viewport = { themeColor: '#12161c' };
 
 export default async function RootLayout({
   children,
@@ -43,9 +54,10 @@ export default async function RootLayout({
         <SessionWrapper session={session}>
           <Providers initialLang={lang}>
             <Navbar />
-            <main className="flex-1">{children}</main>
+            <div className="flex flex-1 flex-col">{children}</div>
             <BackToTop />
             <Footer />
+            <MobileTabBar />
             <Analytics/>
           </Providers>
         </SessionWrapper>

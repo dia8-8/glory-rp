@@ -20,9 +20,9 @@ export default function SignInClient({ initialLang, strings }: { initialLang: La
         backgroundRepeat: 'no-repeat',
       }}
     >
-      <div className="absolute inset-0 -z-10 bg-black/50" aria-hidden />
+      <div className="absolute inset-0 -z-10 bg-ink/80" aria-hidden />
       <section className="mx-auto flex min-h-[100dvh] w-full max-w-xl items-center justify-center px-4 text-center">
-        <div className="w-full rounded-2xl border border-white/10 bg-black/40 p-8 backdrop-blur">
+        <div className="w-full card p-8 sm:p-10">
           <h1 className="text-3xl font-extrabold">{strings.login.title}</h1>
           <p className="mt-2 text-white/80">{strings.login.body}</p>
 

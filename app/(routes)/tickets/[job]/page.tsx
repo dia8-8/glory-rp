@@ -20,10 +20,10 @@ export default async function TicketPage({ params }: { params: { job: string } }
   const isAr = L.isAr;
 
   return (
-    <div className="relative w-full min-h-[100svh] bg-[#170930]">
+    <div className="page-shell">
       <main className="mx-auto max-w-3xl px-4 pb-14 pt-24 sm:pt-28 md:pt-32">
         <div className="mx-auto mb-8 max-w-2xl text-center">
-          <h1 className="text-3xl font-extrabold sm:text-4xl md:text-5xl">
+          <h1 className="section-title">
             {isAr ? ticket.titleAr : ticket.titleEn}
           </h1>
           <p className="mt-3 text-base text-white/80">

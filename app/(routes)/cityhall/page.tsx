@@ -23,10 +23,10 @@ export default async function CityhallIndexPage() {
   const isAr = L.isAr;
 
   return (
-    <main className="relative w-full min-h-[100svh] bg-[#170930]">
+    <main className="page-shell">
       <div className="mx-auto max-w-7xl px-4 pb-16 pt-24 sm:pt-28 md:pt-32">
         <div className="mx-auto mb-8 max-w-3xl text-center">
-          <h2 className="text-3xl font-extrabold sm:text-4xl md:text-5xl">
+          <h2 className="section-title">
             {isAr ? 'البلدية' : 'City Hall'}
           </h2>
           <p className="mt-3 text-base text-white/80">
@@ -41,15 +41,14 @@ export default async function CityhallIndexPage() {
               <Reveal key={category.slug} delay={i * 0.05}>
                 <Link
                   href={`/cityhall/${category.slug}`}
-                  className="group card relative flex h-full flex-col items-center justify-start p-8 pt-12 text-center transition-transform hover:scale-[1.02]"
+                  className="group card relative flex h-full flex-col items-center justify-start p-8 pt-12 text-center card-hover"
                 >
                   <div className="absolute -top-7 left-1/2 -translate-x-1/2">
                     <div
-                      className="flex h-14 w-14 items-center justify-center rounded-2xl ring-2 ring-white/20 shadow-xl"
-                      style={{ background: 'linear-gradient(135deg, var(--brand-from), var(--brand-to))' }}
+                      className="icon-tile transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-6"
                       aria-hidden
                     >
-                      <Icon className="h-7 w-7 text-white/80" />
+                      <Icon className="h-7 w-7" />
                     </div>
                   </div>
                   <h3 className="text-lg font-extrabold">
@@ -58,7 +57,7 @@ export default async function CityhallIndexPage() {
                   <p className="mt-3 text-sm text-white/70">
                     {isAr ? category.descAr : category.descEn}
                   </p>
-                  <span className="mt-6 inline-block btn btn-ghost cursor-pointer">
+                  <span className="mt-6 btn btn-outline">
                     {isAr ? 'فتح النموذج' : 'Open Form'}
                   </span>
                 </Link>

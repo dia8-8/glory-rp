@@ -63,13 +63,13 @@ export default function ApplyForm({
   }
 
   return (
-    <form onSubmit={onSubmit} className="space-y-4 bg-[#170930] p-6 rounded-xl">
+    <form onSubmit={onSubmit} className="card space-y-4 p-6 sm:p-8">
       <div>
         <label className="text-sm opacity-80">{isAr ? 'حساب ديسكورد' : 'Discord Account'}</label>
         <input
           value={discordName}
           readOnly
-          className="mt-1 w-full rounded-xl border border-white/15 bg-white/10 px-3 py-2 text-white/90"
+          className="field cursor-not-allowed bg-white/5 text-white/60"
         />
         <p className="mt-1 text-xs text-white/60">{isAr ? 'تم جلبه من تسجيل الدخول.' : 'Fetched from your sign-in.'}</p>
       </div>
@@ -78,17 +78,17 @@ export default function ApplyForm({
         <div>
             <label className="text-sm opacity-80">{isAr ? 'اسم شخصيتك' : 'Your character name'}</label>
             <input name="name" placeholder={isAr ? 'يجب أن يكون الاسم الحقيقي' : 'Must be a real name'} value={form.name} onChange={onChange}
-            className="mt-1 w-full rounded-xl border border-white/15 bg-white/5 px-3 py-2" required />
+            className="field" required />
         </div>
         <div>
           <label className="text-sm opacity-80">{isAr ? 'العمر' : 'Age'}</label>
           <input name="age" type="number" min={16} value={form.age} onChange={onChange}
-                 className="mt-1 w-full rounded-xl border border-white/15 bg-white/5 px-3 py-2" required />
+                 className="field" required />
         </div>
         {/* <div>
           <label className="text-sm opacity-80">{isAr ? 'المنطقة الزمنية' : 'Timezone'}</label>
           <input name="timezone" placeholder={isAr ? 'مثال: GMT+3' : 'e.g. GMT+3'} value={form.timezone} onChange={onChange}
-                 className="mt-1 w-full rounded-xl border border-white/15 bg-white/5 px-3 py-2" required />
+                 className="field" required />
         </div> */}
       </div>
 
@@ -96,12 +96,12 @@ export default function ApplyForm({
         {/* <div>
           <label className="text-sm opacity-80">{isAr ? 'ساعات اللعب أسبوعيًا' : 'Hours per week'}</label>
           <input name="hours" type="number" min={0} value={form.hours} onChange={onChange}
-                 className="mt-1 w-full rounded-xl border border-white/15 bg-white/5 px-3 py-2" required />
+                 className="field" required />
         </div> */}
         <div>
           <label className="text-sm opacity-80">{isAr ? 'هل لديك مايكروفون؟' : 'Do you have a microphone?'}</label>
           <select name="mic" value={form.mic} onChange={onChange}
-                  className="mt-1 w-full rounded-xl border border-white/15 bg-[#2a0c4a]/40 text-white/90 px-3 py-2 outline-none transition focus:border-[#c27cff] focus:ring-1 focus:ring-[#c27cff]">
+                  className="field">
             <option value="yes">{isAr ? 'نعم' : 'Yes'}</option>
             <option value="no">{isAr ? 'لا' : 'No'}</option>
           </select>
@@ -111,20 +111,20 @@ export default function ApplyForm({
       <div>
         <label className="text-sm opacity-80">{isAr ? 'خبرتك السابقة في RP' : 'Your RP experience'}</label>
         <textarea name="experience" rows={4} value={form.experience} onChange={onChange}
-                  className="mt-1 w-full rounded-xl border border-white/15 bg-white/5 px-3 py-2" required />
+                  className="field" required />
       </div>
 
       <div>
         <label className="text-sm opacity-80">{isAr ? 'رابط Steam' : 'Steam link'}</label>
         <input name="steam" value={form.steam} onChange={onChange}
-               className="mt-1 w-full rounded-xl border border-white/15 bg-white/5 px-3 py-2" placeholder="https://..." required />
+               className="field" placeholder="https://..." required />
       </div>
 
       {/* Last row: About (alone) */}
       <div>
         <label className="text-sm opacity-80">{isAr ? ' قصة شخصيتك' : 'Your character story'}</label>
         <textarea name="about" rows={5} value={form.about} onChange={onChange}
-                  className="mt-1 w-full rounded-xl border border-white/15 bg-white/5 px-3 py-2" required />
+                  className="field" required />
       </div>
 
       <div className="flex items-center justify-between gap-3">

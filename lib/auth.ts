@@ -31,6 +31,9 @@ export const authOptions: NextAuthOptions = {
     DiscordProvider({
       clientId: process.env.DISCORD_CLIENT_ID!,
       clientSecret: process.env.DISCORD_CLIENT_SECRET!,
+      // Discord now sends `iss` in the OAuth callback; openid-client rejects it
+      // ("issuer must be configured on the issuer") unless the issuer is set here.
+      issuer: "https://discord.com",
       authorization: { params: { scope: "identify email" } },
 
       profile(profile: any) {

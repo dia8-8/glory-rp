@@ -26,9 +26,9 @@ export default async function ApplyPage() {
           backgroundRepeat: 'no-repeat',
         }}
       >
-        <div className="absolute inset-0 -z-10 bg-black/50" />
-        <section className="mx-auto flex min-h-[100dvh] w-full max-w-xl items-center justify-center px-4 text-center bg-[#170930]">
-          <div className="w-full rounded-2xl border border-white/10 bg-black/40 p-8 backdrop-blur">
+        <div className="absolute inset-0 -z-10 bg-ink/80" />
+        <section className="mx-auto flex min-h-[100dvh] w-full max-w-xl items-center justify-center px-4 text-center">
+          <div className="w-full card p-8 sm:p-10">
             <h1 className="text-3xl font-extrabold">
               {isAr ? 'انضم إلينا' : 'Join us'}
             </h1>
@@ -51,12 +51,11 @@ export default async function ApplyPage() {
 
   return (
     <main
-      className="relative min-h-[100dvh] bg-[#170930]"
+      className="page-shell min-h-[100dvh]"
     >
-      <div className="absolute inset-0 -z-10 bg-black/50" />
       <section className="mx-auto w-full max-w-3xl px-4 pb-16 pt-24 sm:pt-28 md:pt-32 ">
         <div className="mx-auto mb-8 max-w-2xl text-center">
-          <h1 className="text-3xl font-extrabold sm:text-4xl md:text-5xl">
+          <h1 className="section-title">
             {isAr ? 'مقابلة الانضمام' : 'Join Interview'}
           </h1>
           <p className="mt-3 text-base text-white/80">
